@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>霍格華茲：轉校生的起點 - 1-2 麻瓜與巫師</title>
+    <style>
+        /* 🌌 承襲 1-1 的暗色調網遊質感 */
+        body {
+            background-color: #0b0e14;
+            color: #c9d1d9;
+            font-family: "Times New Roman", "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 📊 頂端常駐全域數值與財富面板（升級版：附帶金銅色飾邊） */
+        .status-panel {
+            max-width: 650px;
+            width: 100%;
+            background-color: #151922;
+            border: 1px solid #2a313d;
+            border-left: 4px solid #dfcf9f; /* 古典金銅色飾邊 */
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+            box-sizing: border-box;
+        }
+        .panel-header-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85em;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 6px;
+        }
+        .info-highlight {
+            color: #dfcf9f;
+            font-weight: bold;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        @media(min-width: 500px) {
+            .grid-container { grid-template-columns: repeat(4, 1fr); }
+        }
+        .stat-box {
+            background-color: #1f242c;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9em;
+            border: 1px solid #2a313d;
+        }
+        .stat-name { color: #8b949e; display: block; font-size: 0.85em; }
+        .stat-value { color: #58a6ff; font-weight: bold; font-size: 1.1em; }
+        .money-value { color: #d29922; }
+
+        /* 🎬 遊戲劇情主容器 */
+        .game-wrapper {
+            max-width: 650px;
+            width: 100%;
+            background-color: #151922;
+            border: 1px solid #2a313d;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            box-sizing: border-box;
+        }
+
+        .story-text {
+            font-size: 1.05em;
+            line-height: 1.8;
+            color: #e1e7ed;
+            margin-bottom: 25px;
+        }
+
+        p { margin-bottom: 18px; text-align: justify; color: #cbd5e1; }
+
+        /* 📜 羊皮紙風格的血統抉擇區美術設計 */
+        .blood-card {
+            background-color: #1f242c;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #2a313d;
+            margin-bottom: 18px;
+            cursor: pointer;
+            display: block;
+            transition: all 0.2s ease;
+        }
+        .blood-card:hover {
+            border-color: #58a6ff;
+            background-color: #262c36;
+        }
+        .blood-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #79c0ff;
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .radio-input {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .blood-quote {
+            font-style: italic;
+            color: #8b949e;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        .blood-details {
+            font-size: 0.9em;
+            color: #c9d1d9;
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+        }
+        .blood-details li {
+            margin-bottom: 4px;
+        }
+
+        /* 按鈕美術設計 */
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            margin-top: 25px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .confirm-btn {
+            background-color: #0a4d26;
+            color: #ffffff;
+            border: 1px solid #2ea44f;
+        }
+        .confirm-btn:hover { background-color: #116934; }
+
+        /* ➔ 前往 1-3 斜角巷的大按鈕 */
+        .next-chapter-btn {
+            background-color: #8b7355; /* 古典金銅色 */
+            color: #ffffff;
+            border: 1px solid #6e5940;
+            box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2);
+            display: none; /* 核心修正：交由 JS 控制狀態，避免權重卡死 */
+        }
+        .next-chapter-btn:hover {
+            background-color: #a38865;
+            box-shadow: 0 0 15px rgba(163, 136, 101, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* 提示框 */
+        blockquote {
+            border-left: 3px solid #d29922;
+            margin-left: 0;
+            padding: 12px 15px;
+            color: #d29922;
+            font-style: italic;
+            background-color: #262116;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.95em;
+        }
+        .reaction-box {
+            background-color: #1c2129;
+            border-left: 4px solid #dfcf9f;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 0 8px 8px 0;
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="status-panel">
+    <div class="panel-header-info">
+        <span>🧙‍♂️ 巫師姓名：<span id="panel-username" class="info-highlight">讀取中...</span></span>
+        <span>🏰 學籍學年：<span class="info-highlight" style="color: #79c0ff;">四年級轉校生</span></span>
+    </div>
+    <div class="grid-container">
+        <div class="stat-box"><span class="stat-name">✨ 魔咒熟練值</span><span class="stat-value" id="panel-mastery">--</span></div>
+        <div class="stat-box"><span class="stat-name">💪 體力值</span><span class="stat-value" id="panel-stamina">--</span></div>
+        <div class="stat-box"><span class="stat-name">🧠 智慧值</span><span class="stat-value" id="panel-wisdom">--</span></div>
+        <div class="stat-box"><span class="stat-name">❤️ 情感值</span><span class="stat-value" id="panel-emotion">--</span></div>
+    </div>
+    <div class="grid-container" style="margin-top: 10px; border-top: 1px solid #21262d; padding-top: 10px;">
+        <div class="stat-box" style="grid-column: span 2;"><span class="stat-name">🩸 巫師血統</span><span class="stat-value" id="panel-blood" style="color: #79c0ff;">未選定</span></div>
+        <div class="stat-box"><span class="stat-name">💰 錢包現金</span><span class="stat-value money-value" id="panel-wallet">60</span> 加隆</div>
+        <div class="stat-box"><span class="stat-name">🏦 古靈閣金庫</span><span class="stat-value money-value" id="panel-bank">--</span> 加隆</div>
+    </div>
+</div>
+
+<div class="game-wrapper">
+    <div class="story-text">
+        <h2>📖 1-2 巫師與麻瓜</h2>
+        <p>「轟隆。」</p>
+        <p>地板毫無預兆地跟著一聲悶雷般的巨響微微顫動。緊接著是沉重、緩慢，卻讓人無比安心的腳步聲，停在了你家門前。</p>
+        <p>三下粗重的敲門聲，震得門板上的灰塵簌簌往下落。</p>
+        <p>你打開門。眼前的身影高大得近乎不可思議，他的亂蓬蓬的黑色鬍鬚和頭髮幾乎遮住了大半張臉，但那雙藏在毛髮底下的眼睛卻像黑甲蟲一樣閃閃發光，盛滿了毫無心機的善意。</p>
+        <p>「哦，看哪，你一定就是 <strong id="player-name-placeholder" style="color:#58a6ff;">$PlayerName</strong> 了！」他用那粗嘎得像砂紙磨過木頭的嗓音說著，一邊拍了拍身上沾染的夏日塵土，從巨大的鼴鼠皮外套口袋裡掏出一柄有些褪色的粉紅色雨傘。</p>
+        <p>「我是魯霸·海格，霍格華茲的鑰匙管理員暨獵場看守。麥教授打過招呼了，說你情況特殊。不過在我們動身去斜角巷買齊你四年級需要的那些符咒書之前……」</p>
+        <p>海格停頓了一下，那雙溫暖的黑眼睛帶著一絲好奇與認真盯著你。</p>
+        <p>「我得先在魔法部的表格上勾選你的家庭背景。你知道的，那些魔法部的官員總是對這些繁文縟節很挑剔。你的父母……他們也是巫師嗎？還是你一直生活在不了解魔法的世界裡？」</p>
+    </div>
+
+    <blockquote>
+        <strong>🔮 【命運的分水嶺：血統抉擇】</strong><br>
+        <strong>⚠️ 系統提示：</strong> 血液中流淌的傳承，將如同刻在靈魂上的烙印。此處的選擇將深遠地影響你後續的劇情延展、部分學院的入學機率，以及與特定角色的情感攻略。請參考以下血統特質，做出你的決定：
+    </blockquote>
+
+    <div id="bloodline-choices">
+        <label class="blood-card">
+            <div class="blood-title">
+                <input type="radio" name="bloodline" value="純血" class="radio-input" onclick="previewBloodValues('純血')">
+                💎 傳承純粹的巫師血脈（純血）
+            </div>
+            <div class="blood-quote">「古老家族的魔力在血液裡流淌，那是天賦，也是沉重的枷鎖。」</div>
+            <ul class="blood-details">
+                <li>· <strong>劇情優勢：</strong> 極有利於攻略史萊哲林靈魂角色，被分入史萊哲林學院的機率大幅提升。</li>
+                <li>· <strong>能力特質：</strong> 初始天賦值高，魔杖與魔咒的【熟練值】、家族【財富值】極易提升。</li>
+                <li>· <strong>潛在限制：</strong> 習慣了克制與優雅，【情感值】不容易提升；體力與智慧表現普通。</li>
+            </ul>
+        </label>
+
+        <label class="blood-card">
+            <div class="blood-title">
+                <input type="radio" name="bloodline" value="混血" class="radio-input" onclick="previewBloodValues('混血')">
+                ⏳ 游走於兩個世界的邊緣（混血）
+            </div>
+            <div class="blood-quote">「一腳踩在魔法的微光裡，一腳踩在麻瓜的喧囂中，你擁有最自由的靈魂。」</div>
+            <ul class="blood-details">
+                <li>· <strong>劇情優勢：</strong> 劇情延展性最平衡，在各學院之間擁有極高的適應力。</li>
+                <li>· <strong>能力特質：</strong> 內心敏銳且堅韌，【情感值】、【體力值】與【智慧值】均極易提升。</li>
+                <li>· <strong>潛在限制：</strong> 魔法熟練值、天賦與初始財富值表現較為平衡、普通。</li>
+            </ul>
+        </label>
+
+        <label class="blood-card">
+            <div class="blood-title">
+                <input type="radio" name="bloodline" value="麻瓜" class="radio-input" onclick="previewBloodValues('麻瓜')">
+                🔌 來自毫無魔法的尋常人家（麻瓜出身）
+            </div>
+            <div class="blood-quote">「帶著對未知世界最純粹的驚奇，你將用雙腳在古老的石磚地上踏出新路。」</div>
+            <ul class="blood-details">
+                <li>· <strong>劇情優勢：</strong> 情感體驗最為細膩深刻，在特定學院（如史萊哲林）的攻略上面臨極高難度的挑戰與拉扯。</li>
+                <li>· <strong>能力特質：</strong> 擁有麻瓜世界的底蘊，初始【財富值】、【情感值】、【體力值】與【智慧值】皆極高。</li>
+                <li>· <strong>潛在限制：</strong> 剛接觸魔法，魔咒【熟練值】不易提升，初始天賦值較低。</li>
+            </ul>
+        </label>
+
+        <button class="action-btn confirm-btn" id="confirm-choice-btn" onclick="lockBloodlineChoice()">[ 確認出身，隨海格出發 ]</button>
+    </div>
+
+    <div class="reaction-box" id="post-choice-reaction">
+        <p>海格看到你點頭給出的答覆，高興地咧開嘴笑，露出一大片黑鬍子。他從鼴鼠皮外套裡掏出一支巨大的羽毛筆，在魔法部皺巴巴的表格上用力勾選了一下。</p>
+        <p>「太棒了！記錄檔案搞定，那群魔法部的古怪官員就沒得挑剔了。」他把粉紅色的雨傘重新夾在腋下，對你眨眨眼，「現在，拿好你的隨身行李，抓緊你的零錢包。我們要去破釜酒吧的後院了——斜角巷的大門，正在等著你呢，四年級的轉校生！」</p>
+        
+        <button class="action-btn next-chapter-btn" id="btn-goto-1-3" onclick="goToChapter1_3()">
+            [ 整理行囊，前往 1-3 斜角巷 ]
+        </button>
+    </div>
+</div>
+
+<script>
+    // ⚙️ 初始化底層變數：承接 1-1 儲存的名字
+    let g_PlayerName = localStorage.getItem('Hogwarts_PlayerName') || "新巫師";
+    let g_Bloodline = "";
+    let g_Wallet = 60;
+    let g_Bank = 0;
+
+    let g_Mastery = 0; let g_Stamina = 0; let g_Wisdom = 0; let g_Emotion = 0;
+
+    // 🩸 新數值矩陣：基礎分從 20 起跳，完全無上限設定 
+    const BLOODLINE_MATRIX = {
+        "純血": { mastery: 25, stamina: 22, wisdom: 22, emotion: 21, bank: 500 },
+        "混血": { mastery: 23, stamina: 23, wisdom: 23, emotion: 23, bank: 500 },
+        "麻瓜": { mastery: 21, stamina: 24, wisdom: 24, emotion: 24, bank: 1000 }
+    };
+
+    // 網頁初始載入渲染
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('player-name-placeholder').innerText = g_PlayerName;
+        // 面板載入儲存的名字
+        document.getElementById('panel-username').innerText = g_PlayerName;
+    });
+
+    // 🖥️ 運作心機：點選 Radio 時頂端面板即時跳動預覽 
+    function previewBloodValues(bloodType) {
+        let preview = BLOODLINE_MATRIX[bloodType];
+        document.getElementById('panel-blood').innerText = bloodType;
+        document.getElementById('panel-mastery').innerText = preview.mastery;
+        document.getElementById('panel-stamina').innerText = preview.stamina;
+        document.getElementById('panel-wisdom').innerText = preview.wisdom;
+        document.getElementById('panel-emotion').innerText = preview.emotion;
+        document.getElementById('panel-bank').innerText = preview.bank;
+    }
+
+    // [確認出身]：寫入數據庫並鎖定 
+    function lockBloodlineChoice() {
+        let radios = document.getElementsByName('bloodline');
+        let chosenValue = "";
+        for (let i = 0; i < radios.length; i++) {
+            if (radios[i].checked) { chosenValue = radios[i].value; break; }
+        }
+
+        if (chosenValue === "") {
+            alert("「命運的表格不能留下空白。」請先在羊皮紙上勾選一個出身背景。");
+            return;
+        }
+
+        g_Bloodline = chosenValue;
+        let finalData = BLOODLINE_MATRIX[g_Bloodline];
+        
+        g_Mastery = finalData.mastery;
+        g_Stamina = finalData.stamina;
+        g_Wisdom = finalData.wisdom;
+        g_Emotion = finalData.emotion;
+        g_Bank = finalData.bank;
+
+        localStorage.setItem('Hogwarts_Bloodline', g_Bloodline);
+        localStorage.setItem('Hogwarts_Stat_Mastery', g_Mastery);
+        localStorage.setItem('Hogwarts_Stat_Stamina', g_Stamina);
+        localStorage.setItem('Hogwarts_Stat_Wisdom', g_Wisdom);
+        localStorage.setItem('Hogwarts_Stat_Emotion', g_Emotion);
+        localStorage.setItem('Hogwarts_Wallet', g_Wallet);
+        localStorage.setItem('Hogwarts_Bank', g_Bank);
+
+        // 鎖定選擇，防呆隱藏
+        document.getElementById('confirm-choice-btn').style.display = 'none';
+        
+        // 核心修正：不靠單純 id 的 block，而是確保元素直接解除隱藏
+        document.getElementById('post-choice-reaction').style.display = 'block';
+        
+        let gotoBtn = document.getElementById('btn-goto-1-3');
+        gotoBtn.style.display = 'block'; // 強制顯示
+
+        document.getElementById('post-choice-reaction').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // ➔ 執行跳轉至 1-3 斜角巷的網頁檔案 [cite: 65, 66]
+    function goToChapter1_3() {
+        window.location.href = "chapter1_3.html"; // 這裡對接到你 1-3 的 HTML 檔案名稱 [cite: 66]
+    }
+</script>
+</body>
+</html>
