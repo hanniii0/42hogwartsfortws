@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>霍格華茲：轉校生的起點 - 斜角巷</title>
+    <style>
+        body {
+            background-color: #0b0e14;
+            color: #e6edf3;
+            font-family: "Times New Roman", "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* 📊 頂端常駐全域四大能力與財富面板 */
+        .status-panel {
+            max-width: 680px;
+            width: 100%;
+            background-color: #151922;
+            border: 1px solid #2a313d;
+            border-left: 4px solid #dfcf9f;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+            box-sizing: border-box;
+        }
+        .panel-title {
+            font-size: 0.85em;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #21262d;
+            padding-bottom: 4px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        @media(min-width: 500px) {
+            .grid-container { grid-template-columns: repeat(4, 1fr); }
+        }
+        .stat-box {
+            background-color: #1f242c;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.9em;
+            border: 1px solid #2a313d;
+        }
+        .stat-name { color: #8b949e; display: block; font-size: 0.85em; }
+        .stat-value { color: #58a6ff; font-weight: bold; font-size: 1.1em; }
+        .money-gold { color: #dfcf9f; text-shadow: 0 0 4px rgba(223, 207, 159, 0.3); }
+
+        /* 🎬 遊戲劇情容器 */
+        .game-container {
+            max-width: 680px;
+            width: 100%;
+            background-color: #151922;
+            padding: 35px;
+            border-radius: 12px;
+            border: 1px solid #2a313d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            box-sizing: border-box;
+        }
+
+        .scene { display: none; }
+        .scene.active { display: block; animation: fadeIn 0.8s ease-in-out; }
+
+        h2 {
+            color: #79c0ff;
+            border-bottom: 1px solid #2a313d;
+            padding-bottom: 12px;
+            font-weight: 500;
+            margin-top: 0;
+            letter-spacing: 1px;
+        }
+        h3 { color: #dfcf9f; margin-top: 30px; font-size: 1.1em; }
+        p { text-align: justify; color: #cbd5e1; }
+
+        .hud {
+            background-color: #1f242c;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2ea44f;
+            margin: 25px 0;
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+        .system-alert {
+            border-left-color: #dfcf9f;
+            background-color: #23201a;
+            color: #dfcf9f;
+        }
+
+        /* 🔮 巫師風格按鈕 */
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            margin: 14px 0;
+            background-color: #1a2332;
+            color: #c9d1d9;
+            border: 1px solid #2d3d54;
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .option-btn:hover {
+            background-color: #223046;
+            border-color: #2ea44f;
+            color: #ffffff;
+            transform: translateX(4px);
+            box-shadow: 0 0 10px rgba(46, 164, 79, 0.2);
+        }
+
+        /* 資金不足防呆鎖定 */
+        .option-btn.disabled {
+            opacity: 0.3 !important;
+            cursor: not-allowed !important;
+            border-color: #30363d !important;
+            background-color: #161b22 !important;
+            color: #8b949e !important;
+            pointer-events: none;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .next-btn {
+            background-color: #0a4d26;
+            color: #ffffff;
+            border: 1px solid #2ea44f;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 25px;
+        }
+        .next-btn:hover {
+            background-color: #116934;
+            border-color: #3fb950;
+            box-shadow: 0 0 15px rgba(63, 185, 80, 0.4);
+        }
+
+        .next-chapter-btn {
+            background-color: #8b7355;
+            color: #ffffff;
+            border: 1px solid #6e5940;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2);
+            margin-top: 30px;
+        }
+        .next-chapter-btn:hover {
+            background-color: #a38865;
+            box-shadow: 0 0 15px rgba(163, 136, 101, 0.5);
+        }
+
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #8b949e;
+            padding: 30px;
+            font-size: 1.05em;
+        }
+        blockquote {
+            border-left: 3px solid #8b949e;
+            margin: 20px 0;
+            padding-left: 15px;
+            color: #8b949e;
+            font-style: italic;
+        }
+        small { display: block; margin-top: 4px; line-height: 1.5; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="status-panel">
+    <div class="panel-title">🧙‍♂️ 霍格華茲學籍檔案面板 (四年級轉校生)</div>
+    <div class="grid-container">
+        <div class="stat-box"><span class="stat-name">✨ 魔咒熟練值</span><span class="stat-value" id="panel-mastery">--</span></div>
+        <div class="stat-box"><span class="stat-name">💪 體力值</span><span class="stat-value" id="panel-stamina">--</span></div>
+        <div class="stat-box"><span class="stat-name">🧠 智慧值</span><span class="stat-value" id="panel-wisdom">--</span></div>
+        <div class="stat-box"><span class="stat-name">❤️ 情感值</span><span class="stat-value" id="panel-emotion">--</span></div>
+    </div>
+    <div class="grid-container" style="margin-top: 10px; border-top: 1px solid #21262d; padding-top: 10px;">
+        <div class="stat-box" style="grid-column: span 2;"><span class="stat-name">🩸 巫師血統</span><span class="stat-value" id="panel-blood" style="color: #79c0ff;">讀取中...</span></div>
+        <div class="stat-box"><span class="stat-name">💰 錢包現金</span><span class="stat-value money-gold" id="panel-wallet">60</span> 加隆</div>
+        <div class="stat-box"><span class="stat-name">🏦 古靈閣金庫</span><span class="stat-value money-gold" id="panel-bank">--</span> 加隆</div>
+    </div>
+</div>
+
+<div class="game-container">
+
+    <div id="scene-intro" class="scene active">
+        <h2>📖 1-3 斜角巷</h2>
+        <p>「歡迎來到斜角巷。」海格的大手在牆磚上敲了三下。</p>
+        <p>眼前的磚塊開始朝兩側退開，夏日刺眼的陽光毫無預兆地灑了下來。這裡與剛才沉悶的倫敦街頭完全不同——鵝卵石路面泛著溫熱的微光，長袍的衣角在人群中摩擦出沙沙聲，空氣裡混雜著飛路粉的煙硝味、大釜店的金屬敲擊聲，盤據在街角的咿啦貓頭鷹商店更不時傳來陣陣拍翅聲。</p>
+        <p>海格摸了摸下巴，轉頭對你說：「在買東西之前，我們得先弄清楚袋子裡有多少金加隆。魔法部給四年級轉校生撥了款，雖然你得在開學後解鎖特定劇情（例如完成第一堂魔咒課）才能去古靈閣動用更龐大的財產，但現在你身上的錢包已經有足夠的資金了。」</p>
+        
+        <div class="hud">
+            <strong>💰 資金帳本初始化：</strong><br>
+            • 身上錢包（可用資金）： <span class="money-gold">60 加隆</span><br>
+            • 古靈閣金庫（初始財產）： <span id="intro-bank-display" class="money-gold">500</span> 加隆<br>
+            <small style="color: #8b949e;">⚠️ 提示：金庫財產需解鎖後續劇情方可動用。由於你是四年級插班生，學校發放了置辦裝備的基礎預算。</small>
+        </div>
+
+        <p>「走吧，我們先去把巫師最重要的夥伴領回家——」海格指著一間破舊、門上剝落金字寫著「奧利凡德」的狹窄店面。</p>
+        
+        <button class="option-btn next-btn" onclick="startOllivander()">🪄 隨海格踏入奧利凡德魔杖店</button>
+    </div>
+
+    <div id="scene-q1" class="scene">
+        <h2>🪄 第一站：奧利凡德的魔杖店</h2>
+        <p>店裡很安靜，無數個細長的木盒堆疊到天花板，空氣中飄著魔力塵埃。奧利凡德先生從陰影裡走出來，他那雙如銀月般的眼睛緊緊盯著你。</p>
+        <p>『試試看吧，孩子。魔杖選擇巫師，但在此之前，我需要先聽聽你靈魂的聲音。』</p>
+        <blockquote>（請回答以下四個問題，奧利凡德先生將為你挑選專屬魔杖。若對結果不滿意，可重新測試。）</blockquote>
+        
+        <h3>【問題一：在不經意的日常裡，旁人最常如何形容你的性格？】</h3>
+        <button class="option-btn" onclick="answerQ1('inward')">◯ A： 內斂、克制，像冬日裡不輕易燃燒的爐火。</button>
+        <button class="option-btn" onclick="answerQ1('intuition')">◯ B： 赤誠、敏銳，憑著直覺與情感感受世界。</button>
+        <button class="option-btn" onclick="answerQ1('rational')">◯ C： 清醒、理性，永遠在混亂中尋找最精準的邏輯。</button>
+    </div>
+
+    <div id="scene-q2" class="scene">
+        <h2>🪄 奧利凡德的魔杖店</h2>
+        <h3>【問題二：當你揮動木柄，你更喜歡什麼樣的施咒方式？】</h3>
+        <button class="option-btn" onclick="answerQ2('flick')">◯ A： 毫無偏差的精準弧線，咒語低吟，點到為止。</button>
+        <button class="option-btn" onclick="answerQ2('slash')">◯ B： 大開大合的利落揮擊，讓魔力隨著情緒瞬間爆發。</button>
+        <button class="option-btn" onclick="answerQ2('hold')">◯ C： 謹慎而克制的防禦起手，看清局勢後再做打算。</button>
+    </div>
+
+    <div id="scene-q3" class="scene">
+        <h2>🪄 奧利凡德的魔杖店</h2>
+        <h3>【問題三：你最渴望、或最想在霍格華茲學會的魔法類型是？】</h3>
+        <button class="option-btn" onclick="answerQ3('Attack')">◯ A： 攻擊（如強力的昏擊咒或決鬥技巧，能保護或征服）。</button>
+        <button class="option-btn" onclick="answerQ3('Defense')">◯ B： 防禦（如屏障咒或守護神咒，在黑暗中建立安全的空間）。</button>
+        <button class="option-btn" onclick="answerQ3('Wisdom')">◯ C： 智慧（如複雜的變形學或古老符文，探尋魔法底層的真相）。</button>
+    </div>
+
+    <div id="scene-q4" class="scene">
+        <h2>🪄 奧利凡德的魔杖店</h2>
+        <h3>【問題四：當你心中凝視著某個目標或某個人，你的態度通常是？】</h3>
+        <button class="option-btn" onclick="answerQ4('restraint')">◯ A： 默默守候，用留白和距離掩飾自己的依戀。</button>
+        <button class="option-btn" onclick="answerQ4('attachment')">◯ B： 執著至極，哪怕前方是深淵，也要握住他的手。</button>
+        <button class="option-btn" onclick="answerQ4('detachment')">◯ C： 保持疏離，理智告訴自己不要輕易沉溺。</button>
+    </div>
+
+    <div id="scene-wand-loading" class="scene">
+        <h2>🔮 【奧利凡德先生的結論】</h2>
+        <p>老人從架子深處抽出一隻泛黃的木盒，指尖輕輕拂過上面的灰塵。『試試這根。』</p>
+        <div class="loading">⏳ 魔杖正在感應你的靈魂，請稍候...</div>
+    </div>
+
+    <div id="scene-wand-result" class="scene">
+        <h2>🔮 【奧利凡德先生的結論】</h2>
+        <p id="ollivander-tease" style="color: #fa8f78; font-style: italic; font-weight: 500; padding: 10px; background: rgba(255,143,120,0.05); border-radius: 6px;"></p>
+        <p>「這是一根帶有特殊共鳴的魔杖，它在你的指尖發出溫熱的嗡鳴。」</p>
+        
+        <div class="hud" style="border-left-color: #79c0ff;">
+            <strong>✨ 你的專屬魔杖已綁定：</strong><br>
+            • 材質：<span id="res-wood" style="color:#79c0ff; font-weight:bold;"></span><br>
+            • 杖芯：<span id="res-core" style="color:#79c0ff; font-weight:bold;"></span><br>
+            • 長度：<span id="res-length" style="color:#58a6ff; font-weight:bold;"></span> 英吋<br>
+            • 彈性：<span id="res-flex" style="color:#8b949e;"></span><br>
+            • 💸 費用：7 加隆
+        </div>
+
+        <button class="option-btn next-btn" onclick="goToPet()">◯ 接受這根魔杖，前往下一站。</button>
+        <button class="option-btn" onclick="retryWand()" style="text-align:center; font-size:0.9em; opacity:0.6;">◯ 感覺不太對，想重新回答問題。</button>
+    </div>
+
+    <div id="scene-pet" class="scene">
+        <h2>🦉 第二站：神奇動物百貨</h2>
+        <p>「接下來，你需要一個伴。」海格把你帶到充斥著各種叫聲的寵物店門口，「學校規定四年級轉校生可以攜帶一隻寵物，這將是你在寢室裡最忠實的聽眾。」</p>
+        
+        <div class="hud system-alert">
+            <strong>⚠️ 系統提示：</strong> 寵物一經選擇<strong>不可逆，亦不可棄養</strong>。牠們將在未來的校園生活與宿舍劇情中陪伴你，請謹慎選擇：
+        </div>
+
+        <button class="option-btn" onclick="buyPet('貓頭鷹', 10)">
+            ◯ 貓頭鷹（花費 10 加隆）<br>
+            <small style="color:#8b949e;">「羽毛帶著夜空的冰冷，眼神疏離而清亮，會在深夜為你銜來遠方的信件。」</small>
+        </button>
+        <button class="option-btn" onclick="buyPet('貓', 25)">
+            ◯ 貓（花費 25 加隆）<br>
+            <small style="color:#8b949e;">「腳步輕盈，慵懶地窩在交誼廳的壁爐旁。牠的瞳孔會隨著魔法的流動而微微放大。」</small>
+        </button>
+        <button class="option-btn" onclick="buyPet('蟾蜍', 1)">
+            ◯ 蟾蜍（花費 1 加隆）<br>
+            <small style="color:#8b949e;">「皮膚微涼，待在潮濕的石磚角落。雖然安靜，卻能在地牢或魔藥學課堂上給你奇妙的安心感。」</small>
+        </button>
+    </div>
+
+    <div id="scene-broom" class="scene">
+        <h2>🧹 第三站：魁地奇精品店</h2>
+        <p>經過亮閃閃的櫥窗時，你很難不被裡面流線型的木柄吸引。海格笑著拍拍你的肩膀：「四年級有飛行課，如果你想在課堂上表現得輕鬆點，或者對魁地奇有興趣，身上剩餘的可用資金或許可以挑選一把掃帚。別擔心，雖然選擇後不可逆，但開學動用古靈閣財產後，隨時可以再回來採買更好的。」</p>
+
+        <button class="option-btn" id="btn-broom1" onclick="buyBroom('二手橫掃七號', 12)">
+            ◯ 二手橫掃七號（Cleansweep 7）｜ 價格：12 加隆<br>
+            <small style="color:#8b949e;">「雖然是十年前的舊型號，但結構扎實。速度一般，而且在強風中車尾容易有輕微的擺動。適合純粹用來代步、不想在載具上花大錢的玩家。」</small>
+        </button>
+        <button class="option-btn" id="btn-broom2" onclick="buyBroom('彗星一百八十號', 18)">
+            ◯ 彗星一百八十號（Comet 180）｜ 價格：18 加隆<br>
+            <small style="color:#8b949e;">「基礎的家庭實用型掃帚。內建了『煞車咒』，飛行時非常安全平穩，但加速性能較差，在魁地奇球場上很容易被對手超車。」</small>
+        </button>
+        <button class="option-btn" id="btn-broom3" onclick="buyBroom('狂風七號', 32)">
+            ◯ 狂風七號（Twigger 90）｜ 價格：32 加隆<br>
+            <small style="color:#8b949e;">「外觀漆面精美，附帶了一些華而不實的小功能（例如內建警告鳴笛）。尾端有些微翹，操控感靈敏，是許多年輕巫師的第一首選。」</small>
+        </button>
+        <button class="option-btn" id="btn-broom4" onclick="buyBroom('彗星裝兩百六十號', 40)">
+            ◯ 彗星兩百六十號（Comet 260）｜ 價格：40 加隆<br>
+            <small style="color:#8b949e;">「傳統老牌彗星公司的得意之作。加速性能良好，雖然極速比不上光輪系列，但它擁有極佳的滯空穩定度，非常適合防守型球員（如看守手）。」</small>
+        </button>
+        <button class="option-btn" id="btn-broom5" onclick="buyBroom('光輪兩千', 55)">
+            ◯ 光輪兩千（Nimbus 2000）｜ 價格：55 加隆<br>
+            <small style="color:#8b949e;">「曾經的王牌。雖然已經被更新的兩千零一取代而降價，打流線型的桃花心木柄和神話般的滑行順暢度，依然能讓你在校園飛行課中傲視群雄。」</small>
+        </button>
+        <button class="option-btn" onclick="buyBroom('無', 0)">
+            ◯ 先不購買掃帚（花費 0 加隆，保留資金）
+        </button>
+    </div>
+
+    <div id="scene-end" class="scene">
+        <h2>🚂 準備前往王十字車站</h2>
+        <p>當你提著沉甸甸的行李，籠子裡的寵物發出低低的鳴叫，海格帶著你穿過逐漸昏暗的倫敦街道，來到了紅磚斑駁的王十字車站。</p>
+        <p>你清點了你在斜角巷獲得的一切，它們將刻上你的名字，成為你在這座古老城堡裡唯一的依恃。</p>
+
+        <div class="hud" style="border-left-color: #dfcf9f; background-color: #1f242c;">
+            <strong>💼 你的開學行李清單已確認：</strong><br>
+            • 🪄 魔杖：<span id="final-wand" style="color:#79c0ff; font-weight:bold;"></span><br>
+            • 🦉 寵物夥伴：<span id="final-pet" style="color:#79c0ff; font-weight:bold;"></span><br>
+            • 🧹 飛行掃帚：<span id="final-broom" style="color:#79c0ff; font-weight:bold;"></span><br>
+            • 💰 錢包剩餘可用資金：<span id="final-wallet" class="money-gold" style="font-weight:bold;"></span> 加隆
+        </div>
+
+        <p>前方就是第九與第十月台之間的第三根石柱——那座通往最神秘、最未知的九又四分之三月台的通道。</p>
+        
+        <button class="action-btn next-chapter-btn" onclick="navigateToChapter1_4()">
+            [ 整理行囊，前往 1-4 九又四分之三月台 ]
+        </button>
+    </div>
+
+</div>
+
+<script>
+    // ⚙️ 全域資料庫
+    let g_Bloodline = localStorage.getItem('Hogwarts_Bloodline') || "未選定";
+    let g_Wallet = 60;
+    let g_Bank = 500; 
+    
+    // 測驗隱形天平
+    let s_Inward = 0, s_Intuition = 0, s_Rational = 0;
+    let s_Restraint = 0, s_Attachment = 0, s_Detachment = 0;
+    let s_CastType = ""; 
+    let s_MagicType = ""; 
+
+    let myWand = { wood: "", core: "", length: 0, flexibility: "" };
+    let myPet = "";
+    let myBroom = "";
+    let wandTestCount = 0;
+
+    // 📋 11種木頭 × 5種杖芯 = 全參數客製化獨白大矩陣
+    const WOOD_DATA = {
+        "蘋果木": "噢，蘋果木……高潔而充滿強大靈魂吸引力的木頭。它絕不適合黑魔法，它看中了你心底那一抹拒絕與黑暗同流的、頑固的純粹。",
+        "櫻桃木": "不可思議……櫻桃木，在日本常代表高貴與異國的神祕。它擁有驚人且極難掌控的致命力量，它選中你，是因為感應到了你血管裡近乎執拗的強烈情感。",
+        "黑檀木": "黑檀木……完美契合決鬥與強大防禦術的木頭。它不隨波逐流，高傲且清冷，它只會臣服於那些對自我要求極高、風骨絕不妥協的巫師手中。",
+        "山楂木": "山楂木是一根充滿內在矛盾與拉扯的魔杖。它擅長療癒，卻也擅長複雜的惡咒。它在等一個內心深邃、永遠在理智與直覺中拉扯的靈魂。",
+        "冬青木": "罕見的冬青木……通常代表著盲目的熱忱或神聖的守護。它會挑選那些正在面臨危險、命運背負著巨大未知拉扯，卻依然堅韌前行的巫師。",
+        "白蠟木": "白蠟木，頑固而高潔。它一生只會忠誠於它真正的主人，一旦轉手便會失去魔力。它感應到了你靈魂深處那一抹不願對外界妥協的尊嚴。",
+        "山毛櫸木": "哦，山毛櫸木！如果你思想狹隘，它便無法發揮威力。但它選中了你，代表它看穿了你那遠超同齡人的成熟、以及包容萬物的智慧眼界。",
+        "黑胡桃木": "黑胡桃木是一根極度挑剔的魔杖。它在尋找內心極度真誠、清醒的巫師。如果你試圖欺騙自己，它的魔力就會瞬間反噬，它看中了你的清醒。",
+        "雪松木": "雪松木，高尚而內斂。任何試圖操控雪松木主人的巫師都會遭到它的迎頭痛擊。它看中了你為人低調、卻能為了認準的目標默默守護到底的堅韌。",
+        "英國橡木": "英國橡木，力量扎實且無比忠誠的木頭。它需要它的夥伴具備非凡的勇氣與高韌性，它看中了你軀殼下那一副在風雨中絕不低頭的傲骨。",
+        "胡桃木": "胡桃木，最受充滿天賦的魔法創新者、解析者喜愛的木頭。它擁有極強的適應力，能精準執行最複雜的咒語，它被你靈魂深處卓越的理性與邏輯吸引了。"
+    };
+
+    const CORE_DATA = {
+        "獨角獸尾毛": "配上獨角獸毛，施法將最為穩定，魔力最不易產生波動或流於黑魔法。它會像最溫柔的影子，死死守護著你。",
+        "火龍的心臟神經": "融入了火龍的心臟神經，這代表你的咒語將具備極端恐怖的爆發力與學習速度！但它很容易隨著你的情緒失控，那是致命的雙刃劍。",
+        "鳳凰羽毛": "銜著鳳凰的羽毛，這是魔力範圍最廣、最難被馴服的核心。它擁有極強的自主意識，常會在最關鍵的黑夜裡，自己為你挑選宿命的戰場。",
+        "雷鳥的尾羽": "契合了雷鳥的尾羽，性格敏感且超脫。它對危險有著驚人的直覺，施咒時往往會伴隨著隱隱的雷鳴，最擅長破開迷霧、逆轉局勢。",
+        "鹿角兔的鹿角": "融進了極其罕見的鹿角兔之角。這是一種走在邊緣、劍走偏鋒的魔力。它不走尋常路，最容易在複雜的變形與禁忌知識中，為你開啟新路。"
+    };
+
+    function updatePanelUI() {
+        document.getElementById('panel-blood').innerText = g_Bloodline;
+        document.getElementById('panel-mastery').innerText = localStorage.getItem('Hogwarts_Stat_Mastery') || "20";
+        document.getElementById('panel-stamina').innerText = localStorage.getItem('Hogwarts_Stat_Stamina') || "20";
+        document.getElementById('panel-wisdom').innerText = localStorage.getItem('Hogwarts_Stat_Wisdom') || "20";
+        document.getElementById('panel-emotion').innerText = localStorage.getItem('Hogwarts_Stat_Emotion') || "20";
+        document.getElementById('panel-wallet').innerText = g_Wallet;
+        document.getElementById('panel-bank').innerText = g_Bank;
+    }
+
+    function changeScene(currentId, nextId) {
+        document.getElementById(currentId).classList.remove('active');
+        document.getElementById(nextId).classList.add('active');
+        updatePanelUI();
+    }
+
+    function startOllivander() { changeScene('scene-intro', 'scene-q1'); }
+
+    function answerQ1(type) {
+        if(type === 'inward') s_Inward++;
+        if(type === 'intuition') s_Intuition++;
+        if(type === 'rational') s_Rational++;
+        changeScene('scene-q1', 'scene-q2');
+    }
+
+    function answerQ2(type) { s_CastType = type; changeScene('scene-q2', 'scene-q3'); }
+    function answerQ3(type) { s_MagicType = type; changeScene('scene-q3', 'scene-q4'); }
+
+    function answerQ4(type) {
+        if(type === 'restraint') s_Restraint++;
+        if(type === 'attachment') s_Attachment++;
+        if(type === 'detachment') s_Detachment++;
+        changeScene('scene-q4', 'scene-wand-loading');
+        setTimeout(generateWand, 2000);
+    }
+
+    // 🔮 全參數演算法的核心：精準交叉判定
+    function generateWand() {
+        wandTestCount++;
+
+        // 🛠️ 1. 木頭材質精密判定（依據問題一、四得分）
+        if (s_Rational > 0 && s_Detachment > 0) {
+            myWand.wood = "黑檀木";
+        } else if (s_Rational > 0 && s_Restraint > 0) {
+            myWand.wood = "胡桃木";
+        } else if (s_Intuition > 0 && s_Attachment > 0) {
+            myWand.wood = "櫻桃木";
+        } else if (s_Intuition > 0 && s_Restraint > 0) {
+            myWand.wood = "山楂木";
+        } else if (s_Inward > 0 && s_Restraint > 0) {
+            myWand.wood = "雪松木";
+        } else if (s_Inward > 0 && s_Attachment > 0) {
+            myWand.wood = "白蠟木";
+        } else if (s_Rational > 0) {
+            myWand.wood = "黑胡桃木";
+        } else if (s_Intuition > 0) {
+            myWand.wood = "蘋果木";
+        } else if (s_Inward > 0) {
+            myWand.wood = "英國橡木";
+        } else if (s_Attachment > 0) {
+            myWand.wood = "冬青木";
+        } else {
+            myWand.wood = "山毛櫸木";
+        }
+
+        // 🛠️ 2. 杖芯精密判定（依據問題二、三施咒與流派追求）
+        if (s_CastType === "slash" && s_MagicType === "Attack") {
+            myWand.core = "火龍的心臟神經";
+        } else if (s_CastType === "flick" && s_MagicType === "Wisdom") {
+            myWand.core = "鳳凰羽毛";
+        } else if (s_CastType === "hold" && s_MagicType === "Defense") {
+            myWand.core = "獨角獸尾毛";
+        } else if (s_MagicType === "Attack" || s_CastType === "slash") {
+            myWand.core = "雷鳥的尾羽";
+        } else {
+            myWand.core = "鹿角兔的鹿角";
+        }
+
+        myWand.length = (Math.random() * (14 - 9) + 9).toFixed(1);
+        const flexibilities = ["相當堅硬且不易彎曲", "富有彈性且相當柔韌", "出乎意料的頑固", "略帶彈性"];
+        myWand.flexibility = flexibilities[Math.floor(Math.random() * flexibilities.length)];
+
+        let teaseText = "";
+        if (wandTestCount === 1) {
+            // 第一次生成：動態拼接專屬材质與杖芯獨白！
+            teaseText = `奧利凡德先生鏡片後的銀白眼睛微微一亮：『噢……<b>${myWand.wood}配上${myWand.core}</b>。${WOOD_DATA[myWand.wood]} ${CORE_DATA[myWand.core]} 握緊它，走你該走的路吧。』`;
+        } else {
+            // 重複刷（Bug防露餡調侃）
+            teaseText = `奧利凡德先生沙啞地笑了笑，那雙空洞的眼睛彷彿直接穿透了你的靈魂。『噢，看啊，依然是 <b>${myWand.wood} 與 ${myWand.core}</b> 的傲然組合，你的靈魂骨架沒有變。』<br><br>老人長嘆了一口氣：『不用再試了，孩子。命運的墨水一旦暈開，就不會輕易被擦去。不過……這根的長度是 <b>${myWand.length} 英吋</b>，它的脾性顯得<b>${myWand.flexibility}</b>。它與剛才那根稍微有了一些微妙的偏差，顯然……它比剛才那根，更能容納你眼底裡泛起的拉扯與不甘。』`;
+        }
+
+        document.getElementById('ollivander-tease').innerHTML = teaseText;
+        document.getElementById('res-wood').innerText = myWand.wood;
+        document.getElementById('res-core').innerText = myWand.core;
+        document.getElementById('res-length').innerText = myWand.length;
+        document.getElementById('res-flex').innerText = myWand.flexibility;
+
+        changeScene('scene-wand-loading', 'scene-wand-result');
+    }
+
+    function retryWand() {
+        s_Inward = 0; s_Intuition = 0; s_Rational = 0;
+        s_Restraint = 0; s_Attachment = 0; s_Detachment = 0;
+        changeScene('scene-wand-result', 'scene-q1');
+    }
+
+    function goToPet() { g_Wallet -= 7; changeScene('scene-wand-result', 'scene-pet'); }
+
+    function buyPet(petName, cost) {
+        myPet = petName; g_Wallet -= cost;
+        document.getElementById('panel-wallet').innerText = g_Wallet;
+        updateBroomButtons();
+        changeScene('scene-pet', 'scene-broom');
+    }
+
+    function updateBroomButtons() {
+        if(g_Wallet < 12) document.getElementById('btn-broom1').classList.add('disabled');
+        if(g_Wallet < 18) document.getElementById('btn-broom2').classList.add('disabled');
+        if(g_Wallet < 32) document.getElementById('btn-broom3').classList.add('disabled');
+        if(g_Wallet < 40) document.getElementById('btn-broom4').classList.add('disabled');
+        if(g_Wallet < 55) document.getElementById('btn-broom5').classList.add('disabled');
+    }
+
+    function buyBroom(broomName, cost) {
+        if (g_Wallet < cost) { alert("資金不足。"); return; }
+        myBroom = broomName; g_Wallet -= cost;
+
+        document.getElementById('final-wand').innerText = `${myWand.wood}、${myWand.core}（${myWand.length}英吋，${myWand.flexibility}）`;
+        document.getElementById('final-pet').innerText = myPet;
+        document.getElementById('final-broom').innerText = myBroom;
+        document.getElementById('final-wallet').innerText = g_Wallet;
+
+        changeScene('scene-broom', 'scene-end');
+    }
+
+    function navigateToChapter1_4() {
+        localStorage.setItem('Hogwarts_Wand', `${myWand.wood}與${myWand.core}`);
+        localStorage.setItem('Hogwarts_Pet', myPet);
+        localStorage.setItem('Hogwarts_Broom', myBroom);
+        localStorage.setItem('Hogwarts_Wallet', g_Wallet);
+        window.location.href = "1-4九又四分之三月台.html"; 
+    }
+
+    window.onload = function() {
+        if(g_Bloodline === "麻瓜") { g_Bank = 1000; document.getElementById('intro-bank-display').innerText = "1000"; }
+        updatePanelUI();
+    }
+</script>
+
+</body>
+</html>
