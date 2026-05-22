@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霍格華茲：分類儀式 - 史萊哲林篇</title>
+    <style>
+        /* 🌌 全案統一：古典英倫深夜魔法美學（史萊哲林銀綠主題） */
+        body { 
+            background-color: #0b0e14; 
+            color: #e6edf3; 
+            font-family: "Georgia", "Times New Roman", "PingFang TC", "Heiti TC", sans-serif; 
+            line-height: 1.8; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden; 
+        }
+
+        /* 🐍 頂端全域常駐漢堡導航欄 */
+        .top-nav-bar { 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 55px; 
+            background-color: rgba(11, 14, 20, 0.85); 
+            backdrop-filter: blur(8px); 
+            border-bottom: 1px solid #56b6c2; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 15px; 
+            box-sizing: border-box;
+            z-index: 900; 
+        }
+        .menu-toggle-btn { 
+            background: none; border: none; 
+            color: #56b6c2; font-size: 26px; 
+            cursor: pointer; padding: 5px 10px; 
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle-btn:active { transform: scale(0.9); }
+
+        /* 🐍 左側全功能常駐狀態欄 */
+        .sidebar-panel { 
+            position: fixed; 
+            top: 0; left: -300px; width: 300px; height: 100%; 
+            background-color: #151922; border-right: 1px solid #2a313d; 
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8); 
+            z-index: 999; 
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 70px 20px 20px 20px; box-sizing: border-box; 
+            overflow-y: auto; 
+        }
+        .sidebar-panel.open { left: 0; }
+        .sidebar-overlay { 
+            display: none; position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.6); z-index: 998; 
+            backdrop-filter: blur(3px); 
+        }
+
+        /* 📊 抽屜內嵌狀態卡 */
+        .drawer-status-card { 
+            background-color: #1f242c; border: 1px solid #2a313d;
+            border-top: 3px solid #56b6c2; border-radius: 8px; 
+            padding: 15px; margin-bottom: 20px; 
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        .drawer-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .drawer-stat-box { 
+            background-color: #151922; padding: 10px 6px; border-radius: 6px; 
+            text-align: center; border: 1px solid #2a313d; 
+        }
+        .drawer-stat-name { color: #8b949e; font-size: 0.8em; display: block; margin-bottom: 2px; }
+        .drawer-stat-value { color: #56b6c2; font-weight: bold; font-size: 1.05em; }
+
+        /* 側邊欄專屬按鈕 */
+        .sidebar-btn { 
+            width: 100%; background-color: #161b22; color: #cbd5e1; 
+            border: 1px solid #30363d; padding: 12px; margin: 8px 0; 
+            border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; 
+            text-align: left; transition: all 0.2s; 
+            font-family: inherit;
+        }
+        .sidebar-btn:active { background-color: #1a2332; border-color: #56b6c2; }
+
+        /* 🎬 遊戲劇情主容器 */
+        .game-container { 
+            max-width: 680px; width: 100%; 
+            background-color: #151922; padding: 35px; 
+            border-radius: 12px; border: 1px solid #2a313d; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
+            box-sizing: border-box; margin-top: 75px; 
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        .next-chapter-btn { 
+            display: block; width: 100%; padding: 15px 20px; 
+            background-color: #56b6c2; color: #0b0e14; border: 1px solid #3b828e; 
+            border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer; 
+            margin-top: 30px; box-shadow: 0 4px 12px rgba(86, 182, 194, 0.2); transition: all 0.2s; 
+            font-family: inherit; font-size: 1.05em;
+        }
+        .next-chapter-btn:hover { background-color: #6fcad6; transform: translateY(-2px); }
+        
+        p { text-align: justify; margin-bottom: 18px; color: #cbd5e1; }
+
+        /* 🎭 獨立輔助系統彈窗 */
+        .modal-popup { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.85); z-index: 2000; 
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; 
+            backdrop-filter: blur(5px); 
+        }
+        .modal-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; max-width: 420px; width: 100%; padding: 25px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div style="color: #56b6c2; font-weight: bold; margin-left: 8px; font-size: 0.85em; letter-spacing: 1px;">🏰 HOGWARTS SYSTEM</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-panel" id="sidebarPanel">
+    <div class="drawer-status-card">
+        <div style="font-size:0.85em; margin-bottom:6px; color:#8b949e;">🧙 巫師：<span id="panel-name" style="color:#dfcf9f; font-weight:bold;">讀取中..</span></div>
+        <div style="font-size:0.85em; color:#8b949e;">🏰 學籍：<span style="color:#2ea043; font-weight:bold;">史萊哲林 🐍</span></div>
+    </div>
+    <div class="drawer-stat-grid" style="margin-bottom: 20px;">
+        <div class="drawer-stat-box"><span class="drawer-stat-name">魔咒熟練</span><span class="drawer-stat-value" id="panel-mastery">--</span></div>
+        <div class="drawer-stat-box"><span class="drawer-stat-name">體力值</span><span class="drawer-stat-value" id="panel-stamina">--</span></div>
+        <div class="drawer-stat-box"><span class="drawer-stat-name">智慧值</span><span class="drawer-stat-value" id="panel-wisdom">--</span></div>
+        <div class="drawer-stat-box"><span class="drawer-stat-name">情感值</span><span class="drawer-stat-value" id="panel-emotion">--</span></div>
+    </div>
+    
+    <button class="sidebar-btn" onclick="openDiaryPage()">📖 翻閱《巫師日記》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('archive')">⏳ 翻開《舊日魔法檔案》</button>
+    <button class="sidebar-btn" onclick="window.location.href='intro.html'">🔮 查閱《入學指南》</button>
+    <button class="sidebar-btn" style="color: #e06c75; margin-top: 20px; border-color: #4c2929;" onclick="resetToMainHall()">🚪 逃離並退回大廳</button>
+</div>
+
+<div class="game-container">
+    <h2 style="color: #56b6c2; border-bottom: 1px solid #56b6c2; padding-bottom: 12px; margin-top: 0; font-weight: 500; letter-spacing: 1px;">🎬 走向銀綠色的幽暗</h2>
+    
+    <p>「——史萊哲林！」</p>
+    <p>分類帽長長的宣告在最後一刻落定。餐桌那一端傳來的，是一陣極其克制、優雅，卻帶著金屬般冰冷質感的掌聲。</p>
+    <p>你解下頭頂的破舊羊皮紙帽，在一片墨綠與純銀交織的巨蛇旗幟下，邁步走向屬於你的位置。大禮堂高聳的穹頂此時翻湧著深夜的暴雨烏雲，懸浮的蠟燭將昏暗的光芒灑在史萊哲林學生們精緻的銀質餐具上。四周那些三年級、四年級的純血家族後裔，正用一種清醒、利己且帶著強烈探究的目光黏在你的身上。</p>
+    <p>因為你是這座城堡裡極其罕見、中途插班的四年級學姐。</p>
+    <p>但在這片有些排外、冷調的氛圍裡，長桌中後段卻有一個少年，隔著人群，溫和地接住了你有些侷促的視線。<br>那是韓振。</p>
+    <p>身為低你兩個年級的二年級學弟，他穿著熨燙得一絲不苟的校袍，安靜地坐在那裡。他是這個學院裡極少數來自遙遠東方的面孔，此時他修長的手指正把玩著那枚純銀的蛇形戒指。儘管年紀比你小，但他身上那股 INFJ 摩羯座特有的沉穩與不俗的天氣場，卻讓周圍的高年級生都不自覺地對他高看一眼。</p>
+    <p>他沒有像周圍的人那樣露出應酬式的冷笑，看見你走過來，眼底反而泛起一抹只有你能看懂的、踏實的安穩。</p>
+    <p>就在你走到座位旁準備坐下的瞬間，這個二年級的學弟搶先站起身。他沒有顧忌周圍高年級純血探尋的視線，而是用一種極其自然且體貼的動作，伸手接過了你提了一整路的沉重行李箱，分毫不差地幫你安置在腳邊最安全的死角。</p>
+    <p>隨後，他無聲地將一盞正散發著溫熱微光的魔法保溫杯，輕輕沿著平滑的石磚桌面推到了你的餐盤旁。</p>
+    <p>「坐吧，學姐。長途旅行……辛苦了。」 韓振微微別過頭，有些不自然地避開了周圍人窺探的目光，習慣性地用這種冷淡的姿態，來掩飾他內心對你最赤誠的照顧。他的嗓音低沉沙啞，帶著一種超乎年齡的沈穩：</p>
+    <p>「地牢的夜裡雨水很重，溫度比上面要冷得多。這杯是剛從廚房拿來的熱蜂蜜水。在那些高年級生用無聊的血統問題為難你之前，先把它喝了。」</p>
+    <p>少年一邊說著，長袍下的指尖下意識地摩挲著那枚純銀戒指。他雖然年紀比你小，但看著你時，眼神亮晶晶的，帶著一絲摩羯座特有的固執與對自我能力的要強。他放低了音量，用只有你們兩個人能聽到的聲音，極其溫柔地開口：</p>
+    <p>「在這間充滿利益交換的學院裡，沒人會去在意一個轉校生的不安。但我看見了。我是二年級的韓振，四年級的魔藥學進度如果遇到了任何麻煩，隨時可以帶著羊皮紙來地下沙龍找我。」</p>
+    <p>他轉過頭，隔著裊裊的熱氣對你微微一笑。那抹笑容極其精緻、純粹，帶著屬於年下學弟毫無防備的溫柔，彷彿在用行動告訴你：誰說蛇院沒有好人？在這裡，哪怕我是學弟，我也會成為你最清醒的底氣。</p>
+    <p>餐桌上方，銀蛇旗幟在風中發出細微的沙沙聲。你翻開膝頭的《巫師日記》，滾燙的翠綠墨水正自動鐫刻：</p>
+
+    <div style="background:#21262d; padding:15px; border-radius:8px; border-left: 4px solid #2ea043; margin-top:20px; line-height: 1.6; border-right: 1px solid #30363d; border-top: 1px solid #30363d; border-bottom: 1px solid #30363d;">
+        <span style="color: #2ea043; font-weight: bold;">📜 史萊哲林檔案已激活</span><br>
+        • 魔咒熟練值(天賦) +3 ｜ 智慧值 +2 ｜ 情感值 +1<br>
+        • 年下羈絆：韓振（二年級）好感度同步永久 +5。<br>
+        <span style="color: #8b949e; font-style: italic; display: block; margin-top: 8px;">「誰說深淵裡只有冰冷？在這裡，那隻隱藏在黑夜裡的毒蛇，已經為你褪去了所有毒牙，只留下最偏執、最溫柔的守護。」</span>
+    </div>
+
+    <button class="next-chapter-btn" onclick="finishSlytherin()">[ 正式開始霍格華茲新生活 ]</button>
+</div>
+
+<!-- 系統彈窗組件 -->
+<div class="modal-popup" id="systemModal" onclick="closeSystemModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div id="modal-title-node" style="color:#dfcf9f; font-weight:bold; font-size:1.1em; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:12px; text-align:center; letter-spacing:1px;"></div>
+        <div id="modal-body-node" style="font-size:0.95em; line-height:1.6; color:#c9d1d9;"></div>
+        <button class="sidebar-btn" style="text-align:center; margin-top:15px; background-color:#21262d; color:#fff;" onclick="closeSystemModal()">關閉面板</button>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        // 🔒 防止上一頁（防越獄機制）
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+            alert("『回憶已經定格，收回你的時光器。』");
+        });
+        
+        // 💥 防重複刷分機制：只有第一次進來才會加分
+        if (!localStorage.getItem('Applied_Slytherin_Bonus')) {
+            applyStats();
+        }
+
+        updatePanelUI();
+    };
+
+    // ⚔️ 寫入加分機制 (魔咒+3, 智慧+2, 情感+1, 好感+5)
+    function applyStats() {
+        let mastery = parseInt(localStorage.getItem('Hogwarts_Stat_Mastery')) || 20;
+        let stamina = parseInt(localStorage.getItem('Hogwarts_Stat_Stamina')) || 20;
+        let wisdom  = parseInt(localStorage.getItem('Hogwarts_Stat_Wisdom'))  || 20;
+        let emotion = parseInt(localStorage.getItem('Hogwarts_Stat_Emotion')) || 20;
+
+        let loveH = parseInt(localStorage.getItem('Hogwarts_Love_HANJIN')) || 0;
+
+        localStorage.setItem('Hogwarts_Stat_Mastery', mastery + 3);
+        localStorage.setItem('Hogwarts_Stat_Wisdom', wisdom + 2);
+        localStorage.setItem('Hogwarts_Stat_Emotion', emotion + 1);
+
+        localStorage.setItem('Hogwarts_Love_HANJIN', loveH + 5);
+        
+        // 打上防護標記防止重新刷分
+        localStorage.setItem('Applied_Slytherin_Bonus', 'true');
+    }
+
+    // 📊 更新側邊狀態欄 UI 數據
+    function updatePanelUI() {
+        document.getElementById('panel-name').innerText = localStorage.getItem('Hogwarts_PlayerName') || "轉校生";
+        document.getElementById('panel-mastery').innerText = localStorage.getItem('Hogwarts_Stat_Mastery') || "20";
+        document.getElementById('panel-stamina').innerText = localStorage.getItem('Hogwarts_Stat_Stamina') || "20";
+        document.getElementById('panel-wisdom').innerText = localStorage.getItem('Hogwarts_Stat_Wisdom') || "20";
+        document.getElementById('panel-emotion').innerText = localStorage.getItem('Hogwarts_Stat_Emotion') || "20";
+    }
+
+    // ☰ 狀態欄控制
+    function toggleSidebar() {
+        let panel = document.getElementById('sidebarPanel');
+        let overlay = document.getElementById('sidebarOverlay');
+        let isOpen = panel.classList.contains('open');
+
+        panel.classList.toggle('open', !isOpen);
+        overlay.style.display = isOpen ? 'none' : 'block';
+    }
+
+    function openDiaryPage() {
+        toggleSidebar();
+        window.location.href = "diary.html";
+    }
+
+    // ⏳ 歷史存檔彈窗
+    function openSystemModal(type) {
+        toggleSidebar(); 
+        let titleNode = document.getElementById('modal-title-node');
+        let bodyNode = document.getElementById('modal-body-node');
+        
+        if (type === 'archive') {
+            titleNode.innerText = "⏳ 舊日魔法檔案";
+            bodyNode.innerHTML = `
+                <p style="text-align:center; color:#8b949e;">— 大廳時空紀錄維度 —</p>
+                <div style="opacity:0.4; text-align:center; margin-top:10px;">• 1-5 霍格華茲特快車 (已過關)</div>
+                <div style="opacity:1; text-align:center; color:#2ea043; font-weight:bold;">• 1-6 分院儀式：史萊哲林 (當前)</div>
+                <div style="opacity:0.15; text-align:center;">• 2-1 進入城堡 🔒</div>
+            `;
+            document.getElementById('systemModal').style.display = 'flex';
+        }
+    }
+
+    function closeSystemModal() { 
+        document.getElementById('systemModal').style.display = 'none'; 
+    }
+
+    function resetToMainHall() { 
+        if (confirm("確定要拋下行李，退回主大廳首頁嗎？")) { 
+            window.location.replace("index.html"); 
+        } 
+    }
+
+    // 🎬 進入下一章節
+    function finishSlytherin() {
+        localStorage.setItem('Hogwarts_Progress', "2-1");
+        setTimeout(function() {
+            window.location.replace("chapter2_1.html");
+        }, 50);
+    }
+</script>
+</body>
+</html>

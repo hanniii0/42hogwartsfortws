@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霍格華茲：分類儀式 - 葛來分多篇</title>
+    <style>
+        /* 🌌 全案統一：古典英倫深夜魔法美學（葛來分多紅金主題） */
+        body { 
+            background-color: #0b0e14; 
+            color: #e6edf3; 
+            font-family: "Georgia", "Times New Roman", "PingFang TC", "Heiti TC", sans-serif; 
+            line-height: 1.8; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden; 
+        }
+
+        /* ☰ 頂端全域常駐漢堡導航欄 */
+        .top-nav-bar { 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 55px; 
+            background-color: rgba(11, 14, 20, 0.85); 
+            backdrop-filter: blur(8px); 
+            border-bottom: 1px solid #ff7b72; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 15px; 
+            box-sizing: border-box;
+            z-index: 900; 
+        }
+        .menu-toggle-btn { 
+            background: none; border: none; 
+            color: #ff7b72; font-size: 26px; 
+            cursor: pointer; padding: 5px 10px; 
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle-btn:active { transform: scale(0.9); }
+
+        /* 🦁 左側全功能常駐狀態欄 */
+        .sidebar-panel { 
+            position: fixed; 
+            top: 0; left: -300px; width: 300px; height: 100%; 
+            background-color: #151922; border-right: 1px solid #2a313d; 
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8); 
+            z-index: 999; 
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            padding: 70px 20px 20px 20px; box-sizing: border-box; 
+            overflow-y: auto; 
+        }
+        .sidebar-panel.open { left: 0; }
+        .sidebar-overlay { 
+            display: none; position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.6); z-index: 998; 
+            backdrop-filter: blur(3px); 
+        }
+
+        /* 📊 抽屜內嵌狀態卡 */
+        .drawer-status-card { 
+            background-color: #1f242c; border: 1px solid #2a313d;
+            border-top: 3px solid #ff7b72; border-radius: 8px; 
+            padding: 15px; margin-bottom: 20px; 
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        .drawer-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .drawer-stat-box { 
+            background-color: #151922; padding: 10px 6px; border-radius: 6px; 
+            text-align: center; border: 1px solid #2a313d; 
+        }
+        .drawer-stat-name { color: #8b949e; font-size: 0.8em; display: block; margin-bottom: 2px; }
+        .drawer-stat-value { color: #ff7b72; font-weight: bold; font-size: 1.05em; }
+
+        /* 側邊欄專屬按鈕 */
+        .sidebar-btn { 
+            width: 100%; background-color: #161b22; color: #cbd5e1; 
+            border: 1px solid #30363d; padding: 12px; margin: 8px 0; 
+            border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold; 
+            text-align: left; transition: all 0.2s; 
+            font-family: inherit;
+        }
+        .sidebar-btn:active { background-color: #223046; border-color: #ff7b72; }
+
+        /* 🎬 遊戲劇情主容器 */
+        .game-container { 
+            max-width: 680px; width: 100%; 
+            background-color: #151922; padding: 35px; 
+            border-radius: 12px; border: 1px solid #2a313d; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7); 
+            box-sizing: border-box; margin-top: 75px; 
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        .next-chapter-btn { 
+            display: block; width: 100%; padding: 15px 20px; 
+            background-color: #8b7355; color: #ffffff; border: 1px solid #6e5940; 
+            border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer; 
+            margin-top: 30px; box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2); transition: all 0.2s; 
+            font-family: inherit; font-size: 1.05em;
+        }
+        .next-chapter-btn:hover { background-color: #a38865; transform: translateY(-2px); }
+        
+        p { text-align: justify; margin-bottom: 18px; color: #cbd5e1; }
+
+        /* 🎭 獨立輔助系統彈窗 */
+        .modal-popup { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.85); z-index: 2000; 
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; 
+            backdrop-filter: blur(5px); 
+        }
+        .modal-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; max-width: 420px; width: 100%; padding: 25px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div style="color: #ff7b72; font-weight: bold; margin-left: 8px; font-size: 0.85em; letter-spacing: 1px;">🏰 HOGWARTS SYSTEM</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-panel" id="sidebarPanel">
+    <div class="drawer-status-card">
+        <div style="font-size:0.85em; margin-bottom:6px; color:#8b949e;">🧙 巫師：<span id="panel-name" style="color:#dfcf9f; font-weight:bold;">讀取中..</span></div>
+        <div style="font-size:0.85em; color:#8b949e;">🏰 學籍：<span style="color:#ff7b72; font-weight:bold;">葛來分多 🦁</span></div>
+    </div>
+    <div class="drawer-stat-grid" style="margin-bottom: 20px;">
+        <div class="drawer-stat-box"><span class="drawer-stat-name">魔咒熟練</span><span class="drawer-stat-value" id="panel-mastery">--</span></div>
+        <div class="drawer-stat-box"><span class="drawer-stat-name">體力值</span><span class="drawer-stat-value" id="panel-stamina">--</span></div>
+        <div class="drawer-stat-box"><span class="drawer-stat-name">智慧值</span><span class="drawer-stat-value" id="panel-wisdom">--</span></div>
+        <div class="drawer-stat-box"><span class="drawer-stat-name">情感值</span><span class="drawer-stat-value" id="panel-emotion">--</span></div>
+    </div>
+    
+    <button class="sidebar-btn" onclick="openDiaryPage()">📖 翻閱《巫師日記》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('archive')">⏳ 翻開《舊日魔法檔案》</button>
+    <button class="sidebar-btn" onclick="window.location.href='intro.html'">🔮 查閱《入學指南》</button>
+    <button class="sidebar-btn" style="color: #e06c75; margin-top: 20px; border-color: #4c2929;" onclick="resetToMainHall()">🚪 逃離並退回大廳</button>
+</div>
+
+<div class="game-container">
+    <h2 style="color: #ff7b72; border-bottom: 1px solid #ff7b72; padding-bottom: 12px; margin-top: 0; font-weight: 500; letter-spacing: 1px;">🎬 走向紅金色的風暴</h2>
+    
+    <p>「——葛來分多！」</p>
+    <p>分類帽的宣告還在穹頂下迴盪，長桌那一端已經掀起了雷鳴般的歡呼。那是一群披著紅金色滾邊長袍的少年，他們幾乎是毫無規矩地拍打著桌面，銀質的餐盤與南瓜汁的高腳杯被震得叮噹作響。</p>
+    <p>你頂著全場的目光，解下頭頂的分類帽，朝著那片像火一樣熱烈的長桌走去。大禮堂高邃的穹頂下，懸浮的蠟燭隨著你的步伐微微晃動，將你長袍的影子在古老的石磚地上拉得極長。</p>
+    <p>在你還沒走到桌邊時，一個敏捷的身影已經率先從長椅上站了起來。<br>那是韓志薫。</p>
+    <p>這個剛剛在火車上差點撞到你的二年級學弟，此時套著一件略顯寬大的葛萊分多長袍。他那雙乾淨、明澈的眼睛裡盛滿了純粹的興奮，像是一隻終於等到同伴的雨燕。他毫無顧忌地越過那些正在喧鬧的高年級生，快步走到你面前，極其自然地接過你手中沉重的隨身行李。</p>
+    <p>「我就知道你會來這裡。」韓志薫揚起清爽的笑意，聲音清亮，在嘈雜的禮堂裡顯得格外清晰。他側過身，用一種近乎炫耀的姿態，在長桌最核心的位置幫你拉開了空位。</p>
+    <p>「介紹一下，這是我們學院今年最厲害的四年級轉校生。」他轉頭對著周圍的同學說，語氣裡帶著一種葛萊分多特有的、不加掩飾的偏執與自豪。</p>
+    <p>你順著他的引導坐下，一抬頭，正對上坐在你正對面的金道勳。</p>
+    <p>身為三年級的學弟，金道勳坐姿顯得有些散漫，他的黑色短袍領口微微敞開，渾身散發著一種冷清、疏離，卻又在葛萊分多中顯得極其異類的智性氣場。</p>
+    <p>他手裡正拿著一柄銀質的餐刀，修長的手指有一下沒一下地在指尖轉動著。看見你坐下，他轉刀的手指微微一停，那雙冷靜、銳利的狗狗眼隔著長桌上的微光，直勾勾地逼視著你的眼睛。</p>
+    <p>車廂裡那種被他審視的壓迫感，在這一刻再度鎖定了你。</p>
+    <p>「看來，命運的表格偶爾也會做出正確的勾選。」金道勳微微勾起嘴角，那抹笑意帶著一絲特有的玩味與不服輸的要強。他放低了嗓音，隔著餐盤上的裊裊熱氣，用只有你們兩個人能聽到的音量開口：</p>
+    <p>「四年級的插班功課很重，如果跟不上，可別躲在寢室裡哭。不過……如果你真的解不開麥教授的變形術公式，我的對面，隨時歡迎你帶著羊皮紙坐過來。」</p>
+    <p>少年一邊說著，一邊將一盤剛切好的、還冒著熱氣的烤牛肉，分毫不差地推到了你的面前。 his 動作極其克制，眼神深處卻藏著一抹連他自己都沒察覺到的、死死咬住你的執著。</p>
+    <p>窗外，夏末的暴雨雷聲隱隱滾動。大禮堂內，紅金色的火光將你們三人的影子交織在古老的牆面上。你翻開膝頭的《巫師日記》，滾燙的紅墨水正在自動鐫刻：</p>
+
+    <div style="background:#21262d; padding:15px; border-radius:8px; border-left: 4px solid #ff7b72; margin-top:20px; line-height: 1.6; border-right: 1px solid #30363d; border-top: 1px solid #30363d; border-bottom: 1px solid #30363d;">
+        <span style="color: #ff7b72; font-weight: bold;">📜 葛來分多檔案已激活</span><br>
+        • 魔咒熟練值 +2 ｜ 體力值 +3 ｜ 情感值 +2<br>
+        • 學弟羈絆：金道勳（三年級）、韓志薫（二年級）好感度同步永久 +5。<br>
+        <span style="color: #8b949e; font-style: italic; display: block; margin-top: 8px;">「在這裡，你將不再孤身一人。風暴與理想，正在前方等著你的魔杖。」</span>
+    </div>
+
+    <button class="next-chapter-btn" onclick="finishGryffindor()">[ 正式開始霍格華茲新生活 ]</button>
+</div>
+
+<!-- 系統彈窗組件 -->
+<div class="modal-popup" id="systemModal" onclick="closeSystemModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div id="modal-title-node" style="color:#dfcf9f; font-weight:bold; font-size:1.1em; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:12px; text-align:center; letter-spacing:1px;"></div>
+        <div id="modal-body-node" style="font-size:0.95em; line-height:1.6; color:#c9d1d9;"></div>
+        <button class="sidebar-btn" style="text-align:center; margin-top:15px; background-color:#21262d; color:#fff;" onclick="closeSystemModal()">關閉面板</button>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        // 🔒 防止上一頁（防越獄機制）
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+            alert("『回憶已經定格，收回你的時光器。』");
+        });
+        
+        // 💥 防重複刷分機制：只有第一次進來才會加分
+        if (!localStorage.getItem('Applied_Gryffindor_Bonus')) {
+            applyStats();
+        }
+
+        updatePanelUI();
+    };
+
+    // ⚔️ 寫入加分機制 (魔咒+2, 體力+3, 情感+2, 好感+5)
+    function applyStats() {
+        let mastery = parseInt(localStorage.getItem('Hogwarts_Stat_Mastery')) || 20;
+        let stamina = parseInt(localStorage.getItem('Hogwarts_Stat_Stamina')) || 20;
+        let wisdom  = parseInt(localStorage.getItem('Hogwarts_Stat_Wisdom'))  || 20;
+        let emotion = parseInt(localStorage.getItem('Hogwarts_Stat_Emotion')) || 20;
+
+        let loveD = parseInt(localStorage.getItem('Hogwarts_Love_DOHOON')) || 0;
+        let loveJ = parseInt(localStorage.getItem('Hogwarts_Love_JIHOON')) || 0;
+
+        localStorage.setItem('Hogwarts_Stat_Mastery', mastery + 2);
+        localStorage.setItem('Hogwarts_Stat_Stamina', stamina + 3);
+        localStorage.setItem('Hogwarts_Stat_Emotion', emotion + 2);
+
+        localStorage.setItem('Hogwarts_Love_DOHOON', loveD + 5);
+        localStorage.setItem('Hogwarts_Love_JIHOON', loveJ + 5);
+        
+        // 打上防護標記防止重新刷分
+        localStorage.setItem('Applied_Gryffindor_Bonus', 'true');
+    }
+
+    // 📊 更新側邊狀態欄 UI 數據
+    function updatePanelUI() {
+        document.getElementById('panel-name').innerText = localStorage.getItem('Hogwarts_PlayerName') || "轉校生";
+        document.getElementById('panel-mastery').innerText = localStorage.getItem('Hogwarts_Stat_Mastery') || "20";
+        document.getElementById('panel-stamina').innerText = localStorage.getItem('Hogwarts_Stat_Stamina') || "20";
+        document.getElementById('panel-wisdom').innerText = localStorage.getItem('Hogwarts_Stat_Wisdom') || "20";
+        document.getElementById('panel-emotion').innerText = localStorage.getItem('Hogwarts_Stat_Emotion') || "20";
+    }
+
+    // ☰ 狀態欄控制
+    function toggleSidebar() {
+        let panel = document.getElementById('sidebarPanel');
+        let overlay = document.getElementById('sidebarOverlay');
+        let isOpen = panel.classList.contains('open');
+
+        panel.classList.toggle('open', !isOpen);
+        overlay.style.display = isOpen ? 'none' : 'block';
+    }
+
+    function openDiaryPage() {
+        toggleSidebar();
+        window.location.href = "diary.html";
+    }
+
+    // ⏳ 歷史存檔彈窗
+    function openSystemModal(type) {
+        toggleSidebar(); 
+        let titleNode = document.getElementById('modal-title-node');
+        let bodyNode = document.getElementById('modal-body-node');
+        
+        if (type === 'archive') {
+            titleNode.innerText = "⏳ 舊日魔法檔案";
+            bodyNode.innerHTML = `
+                <p style="text-align:center; color:#8b949e;">— 大廳時空紀錄維度 —</p>
+                <div style="opacity:0.4; text-align:center; margin-top:10px;">• 1-5 霍格華茲特快車 (已過關)</div>
+                <div style="opacity:1; text-align:center; color:#ff7b72; font-weight:bold;">• 1-6 分院儀式：葛來分多 (當前)</div>
+                <div style="opacity:0.15; text-align:center;">• 2-1 進入城堡 🔒</div>
+            `;
+            document.getElementById('systemModal').style.display = 'flex';
+        }
+    }
+
+    function closeSystemModal() { 
+        document.getElementById('systemModal').style.display = 'none'; 
+    }
+
+    function resetToMainHall() { 
+        if (confirm("確定要拋下行李，退回主大廳首頁嗎？")) { 
+            window.location.replace("index.html"); 
+        } 
+    }
+
+    // 🎬 進入下一章節
+    function finishGryffindor() {
+        localStorage.setItem('Hogwarts_Progress', "2-1");
+        setTimeout(function() {
+            window.location.replace("chapter2_1.html");
+        }, 50);
+    }
+</script>
+</body>
+</html>

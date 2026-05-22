@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霍格華茲：轉校生的起點 - 1-6 分類儀式</title>
+    <style>
+        /* 🌌 全案統一：古典英倫深夜魔法美學 */
+        body {
+            background-color: #0b0e14;
+            color: #e6edf3;
+            font-family: "Georgia", "Times New Roman", "PingFang TC", "Heiti TC", sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ☰ 頂端全域常駐漢堡導航欄 */
+        .top-nav-bar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 55px;
+            background-color: rgba(11, 14, 20, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #2a313d;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 900;
+        }
+        .menu-toggle-btn {
+            background: none; border: none;
+            color: #dfcf9f; font-size: 26px;
+            cursor: pointer; padding: 5px 10px;
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle-btn:active { transform: scale(0.9); }
+
+        /* 🏰 左側全功能常駐狀態欄 */
+        .sidebar-panel {
+            position: fixed;
+            top: 0; left: -300px; width: 300px; height: 100%;
+            background-color: #151922; border-right: 1px solid #2a313d;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+            z-index: 999;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 70px 20px 20px 20px; box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .sidebar-panel.open { left: 0; }
+        .sidebar-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 998;
+            backdrop-filter: blur(3px);
+        }
+
+        /* 📊 抽屜內嵌狀態卡 */
+        .drawer-status-card {
+            background-color: #1f242c; border: 1px solid #2a313d;
+            border-top: 3px solid #dfcf9f; border-radius: 8px;
+            padding: 15px; margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        .drawer-card-title {
+            font-size: 0.85em; color: #8b949e; letter-spacing: 1px;
+            text-transform: uppercase; border-bottom: 1px solid #21262d;
+            padding-bottom: 6px; margin-bottom: 12px;
+            display: flex; justify-content: space-between;
+        }
+        .drawer-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .drawer-stat-box {
+            background-color: #151922; padding: 10px 6px; border-radius: 6px;
+            text-align: center; font-size: 0.85em; border: 1px solid #2a313d;
+        }
+        .drawer-stat-name { color: #8b949e; display: block; font-size: 0.8em; margin-bottom: 2px; }
+        .drawer-stat-value { color: #58a6ff; font-weight: bold; font-size: 1.05em; }
+        .money-gold { color: #dfcf9f; text-shadow: 0 0 4px rgba(223, 207, 159, 0.3); }
+        .sidebar-title-tag { color: #8b949e; font-size: 0.8em; font-weight: bold; margin-top: 20px; margin-bottom: 5px; display: block; }
+        
+        /* 側邊欄專屬按鈕 */
+        .sidebar-btn {
+            width: 100%; background-color: #161b22; color: #cbd5e1;
+            border: 1px solid #30363d; padding: 12px; margin: 8px 0;
+            border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold;
+            text-align: left; transition: all 0.2s;
+            font-family: inherit;
+        }
+        .sidebar-btn:active { background-color: #223046; border-color: #dfcf9f; }
+
+        /* 🎬 遊戲劇情主容器 */
+        .game-container {
+            max-width: 680px; width: 100%;
+            background-color: #151922; padding: 35px;
+            border-radius: 12px; border: 1px solid #2a313d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            box-sizing: border-box; margin-top: 75px;
+        }
+        .scene { display: none; }
+        .scene.active { display: block; animation: fadeIn 0.6s ease-in-out; }
+        
+        h2 {
+            color: #79c0ff; border-bottom: 1px solid #2a313d;
+            padding-bottom: 12px; font-weight: 500; margin-top: 0; letter-spacing: 1px;
+        }
+        h3 { color: #dfcf9f; margin-top: 30px; font-size: 1.1em; }
+        p { text-align: justify; color: #cbd5e1; }
+
+        /* 🔮 兩段式選項與確認鈕 */
+        .option-btn {
+            display: block; width: 100%; padding: 15px 20px; margin: 14px 0;
+            background-color: #1a2332; color: #c9d1d9; border: 1px solid #2d3d54;
+            border-radius: 6px; text-align: left; cursor: pointer;
+            font-size: 1em; font-family: inherit; transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .option-btn:hover {
+            background-color: #223046; border-color: #dfcf9f; color: #ffffff;
+            transform: translateX(4px);
+        }
+        .option-btn.selected {
+            border-color: #dfcf9f !important;
+            background-color: #223046 !important;
+            box-shadow: 0 0 12px rgba(223, 207, 159, 0.2);
+        }
+        .confirm-btn {
+            display: none; width: 100%; padding: 14px;
+            background-color: #0a4d26; color: #ffffff; border: 1px solid #2ea44f;
+            border-radius: 4px; text-align: center; font-weight: bold; cursor: pointer;
+            margin-top: 20px; font-family: inherit; font-size: 1.05em;
+        }
+        .confirm-btn:hover { background-color: #116934; }
+
+        .next-chapter-btn {
+            display: block; width: 100%; padding: 15px 20px;
+            background-color: #8b7355; color: #ffffff; border: 1px solid #6e5940;
+            border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer;
+            margin-top: 25px; box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2); transition: all 0.2s;
+        }
+        .next-chapter-btn:hover { background-color: #a38865; transform: translateY(-2px); }
+
+        blockquote {
+            border-left: 3px solid #dfcf9f; margin: 20px 0; padding: 10px 15px;
+            background-color: #23201a; color: #dfcf9f; font-style: italic; border-radius: 0 6px 6px 0;
+        }
+        
+        /* 🎭 獨立輔助系統彈窗 */
+        .modal-popup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); z-index: 2000;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; max-width: 420px; width: 100%; padding: 25px; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div style="color: #dfcf9f; font-weight: bold; margin-left: 8px; font-size: 0.85em; letter-spacing: 1px;">🏰 HOGWARTS SYSTEM</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-panel" id="sidebarPanel">
+    <div class="drawer-status-card">
+        <div class="drawer-card-title"><span>🧙 巫師：<span id="panel-username" style="color:#dfcf9f; font-weight:bold;">讀取中..</span></span></div>
+        <div class="drawer-card-title" style="border:none; margin-bottom:5px; padding-bottom:0;"><span>🏰 學籍：<span id="panel-house-display" style="color:#79c0ff; font-weight:bold;">四年級轉校生</span></span></div>
+    </div>
+    
+    <div class="sidebar-title-tag">— ⚖️ 靈魂核心特質 —</div>
+    <div class="drawer-status-card">
+        <div class="drawer-stat-grid">
+            <div class="drawer-stat-box"><span class="drawer-stat-name">魔咒熟練</span><span class="drawer-stat-value" id="panel-mastery">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">體力值</span><span class="drawer-stat-value" id="panel-stamina">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">智慧值</span><span class="drawer-stat-value" id="panel-wisdom">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">情感值</span><span class="drawer-stat-value" id="panel-emotion">--</span></div>
+        </div>
+    </div>
+    
+    <div class="sidebar-title-tag">— 💰 巫師資產帳本 —</div>
+    <div class="drawer-status-card">
+        <div style="font-size:0.85em; margin-bottom:8px;">血統：<span id="panel-blood" style="color:#79c0ff; font-weight:bold;">讀取中..</span></div>
+        <div style="font-size:0.85em; margin-bottom:8px;">隨身錢袋：<span class="drawer-stat-value money-gold" id="panel-wallet">--</span> 加隆</div>
+        <div style="font-size:0.85em;">古靈閣金庫：<span class="drawer-stat-value money-gold" id="panel-bank">--</span> 加隆</div>
+    </div>
+
+    <div class="sidebar-title-tag">— ⚙️ 系統導航 —</div>
+    <button class="sidebar-btn" onclick="openSystemModal('diary')">📖 翻開《巫師個人日記》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('guide')">🔮 查閱《入學指南介紹》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('archive')">⏳ 翻開《舊日魔法檔案》</button>
+    <button class="sidebar-btn" style="color: #e06c75; margin-top: 20px; border-color: #4c2929;" onclick="alert('正在退回大廳...')">🚪 逃離並退回遊戲大廳</button>
+</div>
+
+<div class="game-container">
+
+    <!-- 🔮 初始化安全島面板 -->
+    <div id="scene-setup" class="scene">
+        <h2>🔮 初始化你的前置選擇（備用安全島）</h2>
+        <p>檢測到您未攜帶前置數據，請補選您在 1-2 確定的出身血統以初始化檔案面板：</p>
+        <button class="option-btn" onclick="initGame('pure')">💎 傳承純粹的巫師血脈（純血）</button>
+        <button class="option-btn" onclick="initGame('mixed')">⏳ 游走於兩個世界的邊緣（混血）</button>
+        <button class="option-btn" onclick="initGame('muggle')">🔌 來自毫無魔法的尋常人家（麻瓜出身）</button>
+    </div>
+
+    <!-- 🎬 劇情起點 -->
+    <div id="scene-intro" class="scene active">
+        <h2>🎬 1-6 分類儀式</h2>
+        <p>活米村的夜風帶著濕漉漉的青草與雨水氣息，被沈重的橡木大門隔絕在後。你跟著麥教授的腳步走進大禮堂。這裡的空間感高邃得近乎不真實，成千上萬支蠟燭憑空懸浮在半空中，將溫熱的微光灑在長條形的餐桌上。</p>
+        <p>最上方的那張桌子，坐著霍格華茲全體教授。而你的頭頂，是施了魔法的穹頂，正倒映著英倫深夜的星空——烏雲翻湧，群星在雲層的縫隙裡像碎銀一樣冷清地閃爍。</p>
+        <p>禮堂正中央，擺著一根孤零零的高腳圓凳。上面放著一頂破舊、打滿補丁、甚至邊緣有些磨損脫線的尖頂巫師帽。那是分類帽。整個禮堂安靜得只能聽見壁爐裡乾柴碎裂的劈啪聲。無數道目光從四個學院的長桌上投射過來，膠著在你的長袍下擺上。</p>
+        <p>「四年級轉校生，請上前。」麥教授沙啞卻清晰的聲音在空曠的禮堂裡迴盪。</p>
+        <p>你走上前，坐上圓凳。當冰冷、粗糙的羊皮紙帽緣落到你頭頂的瞬間，一個細微、沙啞，彷彿隔著幾百年歷史的低沈嗓音，直接在你的腦海深處震動了起來：</p>
+        <p>『哦……有意思。一個中途插班的四年級靈魂。你的眼神裡有著一些我許久沒見過的拉扯、清醒，與不甘。來吧，別試圖對一頂帽子撒謊，讓我看看你靈魂的骨架，究竟是用什麼搭建而成的……』</p>
+        <button class="option-btn next-btn" onclick="changeScene('scene-intro', 'scene-q1')">🔮 閉上雙眼，向分類帽敞開靈魂</button>
+    </div>
+
+    <!-- 🔮 靈魂拷問（一） -->
+    <div id="scene-q1" class="scene">
+        <h2>🔮 靈魂拷問（一）</h2>
+        <p>『在一個寂靜的深夜，你聽到窗外傳來一種聲音，最吸引你探頭去看的是？』</p>
+        <button class="option-btn q1-opt" onclick="selectOption(this, 'q1', 'RAVENCLAW')">A. 遠方不知名鳥類吹奏出極其複雜、優美的夜曲<br><small style="color:#8b949e;">「那是寂寞的藝術。你的理智與感性，總是不自覺地被那些隱藏在迷霧背後的真理與未知所吸引……」</small></button>
+        <button class="option-btn q1-opt" onclick="selectOption(this, 'q1', 'HUFFLEPUFF')">B. 廚房裡壁爐乾柴燃燒、劈啪作響的溫暖聲音<br><small style="color:#8b949e;">「那是家的隱喻。你終其一生都在尋找的，或許只是一份安全的歸屬、舒適與永遠不會背叛你的火光……」</small></button>
+        <button class="option-btn q1-opt" onclick="selectOption(this, 'q1', 'GRYFFINDOR')">C. 暴風雨中樹枝瘋狂拍打窗戶的聲音<br><small style="color:#8b949e;">「你想去看看那場風暴，對嗎？你渴望危險的浪潮、感官的刺激，那些能讓血液沸騰的未知冒險……」</small></button>
+        <button class="option-btn q1-opt" onclick="selectOption(this, 'q1', 'SLYTHERIN')">D. 隔壁房間傳來極其細微、像是兩人在密謀的低語<br><small style="color:#8b949e;">「你在黑暗中保持清醒。你對秘密、權力與那些不為人知的掌控權有著野獸般的敏難……」</small></button>
+        <button id="btn-confirm-q1" class="confirm-btn" onclick="commitQuestion('q1', 'scene-q1', 'scene-q2')">確認此項靈魂抉擇</button>
+    </div>
+
+    <!-- 🔮 靈魂拷問（二） -->
+    <div id="scene-q2" class="scene">
+        <h2>🔮 靈魂拷問（二）</h2>
+        <p>『如果可以調配一種能讓你聞到「最渴望事物」的迷情劑，你最先聞到的氣味會地是？』</p>
+        <button class="option-btn q2-opt" onclick="selectOption(this, 'q2', 'SLYTHERIN')">A. 帶著一絲冰冷、神祕的薄荷與皮革<br><small style="color:#8b949e;">「高貴、野心，與絕對的自控。你清楚地知道自己要爬上哪一個頂端，且只做有把握的事。」</small></button>
+        <button class="option-btn q2-opt" onclick="selectOption(this, 'q2', 'GRYFFINDOR')">B. 燃燒的柴火與新鮮海風<br><small style="color:#8b949e;">「風浪、自由，與沒有邊界的曠野。你想用雙腳去踏平一切困難，永不回頭。」</small></button>
+        <button class="option-btn q2-opt" onclick="selectOption(this, 'q2', 'HUFFLEPUFF')">C. 剛出爐的熱麵包與草地<br><small style="color:#8b949e;">「平凡、自然，與溫熱的幸福。你希望世界友善，而你愛的人都在並肩的距離之內。」</small></button>
+        <button class="option-btn q2-opt" onclick="selectOption(this, 'q2', 'RAVENCLAW')">D. 昂貴墨水與古董羊皮紙<br><small style="color:#8b949e;">「邏輯、知識，與智慧帶來的成就。你在冷靜的字裡行間，尋找著屬於你一個人的秩序。」</small></button>
+        <button id="btn-confirm-q2" class="confirm-btn" onclick="commitQuestion('q2', 'scene-q2', 'scene-q3')">確認此項靈魂抉擇</button>
+    </div>
+
+    <!-- 🔮 靈魂拷問（三） -->
+    <div id="scene-q3" class="scene">
+        <h2>🔮 靈魂拷問（三）</h2>
+        <p>『期末考前夕，你意外在圖書館走廊撿到了「明天黑魔法防禦術的解答考卷」，你會怎麼做？』</p>
+        <button class="option-btn q3-opt" onclick="selectOption(this, 'q3', 'GRYFFINDOR')">A. 雖然不看，但也絕不打小報告，把它留在原地看誰運氣好撿到<br><small style="color:#8b949e;">「堂堂正正的叛逆。你不屑作弊，卻也反感告密。你喜歡把命運交給運氣和一場豪賭。」</small></button>
+        <button class="option-btn q3-opt" onclick="selectOption(this, 'q3', 'HUFFLEPUFF')">B. 直接交給教授，並告訴他這是在哪裡撿到的<br><small style="color:#8b949e;">「誠實是你的本能。你遵守規則，不屑於用虛假的捷徑來玷污自己的清白。」</small></button>
+        <button class="option-btn q3-opt" onclick="selectOption(this, 'q3', 'SLYTHERIN')">C. 把它藏起來自己背熟，確保明天自己能拿滿分<br><small style="color:#8b949e;">「利己主義。你對自我的認知太清楚了，既然優勢掉在腳邊，為了不凡的成就，你不會拒絕這份手段。」</small></button>
+        <button class="option-btn q3-opt" onclick="selectOption(this, 'q3', 'RAVENCLAW')">D. 仔細研究上面的題目，看看有沒有自己還沒弄懂的魔法原理<br><small style="color:#8b949e;">「你真是個怪人。你根本不在乎那個分數，你只在乎知識本身，你在用自己的邏輯解讀世界。」</small></button>
+        <button id="btn-confirm-q3" class="confirm-btn" onclick="commitQuestion('q3', 'scene-q3', 'scene-q4')">確認此項靈魂抉擇</button>
+    </div>
+
+    <!-- 🔮 靈魂拷問（四） -->
+    <div id="scene-q4" class="scene">
+        <h2>🔮 靈魂拷問（四）</h2>
+        <p>『你和朋友在禁忌森林探險，突然遭遇了一隻飢餓的「奇美拉獸」，此時你第一個直覺反應是？』</p>
+        <button class="option-btn q4-opt" onclick="selectOption(this, 'q4', 'RAVENCLAW')">A. 迅速拉著朋友躲進旁邊的隱密草叢，屏住呼吸觀察怪獸的弱點再行動<br><small style="color:#8b949e;">「多方考量。你在混亂中迅速尋找最都合適的解法，冷靜得像是一台正在精密運算的機器。」</small></button>
+        <button class="option-btn q4-opt" onclick="selectOption(this, 'q4', 'HUFFLEPUFF')">B. 用身體擋在受傷的朋友前面，一邊發抖一邊施展防禦咒死守<br><small style="color:#8b949e;">「你是一隻真正的獾。在保護這件事上，你比誰都勇敢。只要認定了並肩的夥伴，你会永遠死守在最前方。」</small></button>
+        <button class="option-btn q4-opt" onclick="selectOption(this, 'q4', 'GRYFFINDOR')">C. 拔出魔杖大喊一聲，主動衝上前吸引怪獸注意，讓朋友有時間逃跑<br><small style="color:#8b949e;">「英勇得近乎愚蠢。你習慣用直進的代表去硬碰硬，哪怕付出體力與犧牲，也要達成理想。」</small></button>
+        <button class="option-btn q4-opt" onclick="selectOption(this, 'q4', 'SLYTHERIN')">D. 評估局勢後，立刻施展隱身咒自己先撤退，再回城堡找教授求救<br><small style="color:#8b949e;">「優先自保。你從不打沒有把握的仗，務實與理性告訴你，盲目的犧牲只是最愚蠢的自我感動。」</small></button>
+        <button id="btn-confirm-q4" class="confirm-btn" onclick="commitQuestion('q4', 'scene-q4', 'scene-q5')">確認此項靈魂抉擇</button>
+    </div>
+
+    <!-- 🔮 靈魂拷問（五） -->
+    <div id="scene-q5" class="scene">
+        <h2>🔮 靈魂拷問（五）</h2>
+        <p>『如果你死後百年，世人談論起你的生平，你最無法忍受他們用哪一個詞來形容你？』</p>
+        <button class="option-btn q5-opt" onclick="selectOption(this, 'q5', 'SLYTHERIN')">A. 「那個平庸之輩」<br><small style="color:#8b949e;">「因為你生來便拒絕平凡。權力、成就是你的不甘，你對自我的認知絕對不容許平庸。」</small></button>
+        <button class="option-btn q5-opt" onclick="selectOption(this, 'q5', 'RAVENCLAW')">B. 「那個無知的人」<br><small style="color:#8b949e;">「因為你遵循著自己的原則與智慧，無知對你而言，是靈魂最大的荒蕪。」</small></button>
+        <button class="option-btn q5-opt" onclick="selectOption(this, 'q5', 'HUFFLEPUFF')">C. 「那個背叛者」<br><small style="color:#8b949e;">「因為你最看重友善、善良與忠誠。你寧可被全世界拋棄，也絕不當推倒夥伴的背叛者。」</small></button>
+        <button class="option-btn q5-opt" onclick="selectOption(this, 'q5', 'GRYFFINDOR')">D. 「那個懦夫」<br><small style="color:#8b949e;">「因為你把勇氣與不回頭的榮譽看得比生命還重，你無法忍受靈魂的退縮。」</small></button>
+        <button id="btn-confirm-q5" class="confirm-btn" onclick="calculateHouseSorting()">確認並遞交靈魂卷軸</button>
+    </div>
+
+    <!-- 🎬 命運的宣判結果 -->
+    <div id="scene-sorting-result" class="scene">
+        <h2>🎬 1-6 命運的宣判與長桌的轟鳴</h2>
+        <p>腦海中的沙沙聲突然安靜了下來。 分類帽長長地嘆了一口氣，那聲嘆息裡夾雜著古老歷史的厚重感：</p>
+        <p>『我明白了……你的行事手段，還有你藏在裙擺下那一絲拉扯的不甘，已經給出了最完美的答案。』</p>
+        <p>『那麼，最適合你的位置，已經萬物歸位了——』</p>
+        
+        <p id="bloodline-intercept-text" style="color: #ff7b72; font-style: italic; display: none; background: rgba(255,123,114,0.1); padding: 12px; border-radius: 6px; margin: 15px 0;"></p>
+
+        <!-- 🦁 葛來分多 -->
+        <div id="declare-GRYFFINDOR" style="display: none;">
+            <h3>🦁 宣告一：葛來分多 (Gryffindor)</h3>
+            <blockquote style="border-left-color: #ff7b72;">「——葛來分多！」</blockquote>
+            <p>長桌的方向瞬間爆發出雷鳴般的掌聲與腳步聲，那群穿著紅金色滾邊長袍的少年們直接站了起來，用力揮舞著手裡的南瓜汁。</p>
+            <p>你抬頭，看見火車上與你因寵物產生碰撞的金道勳（與因魁地奇而相識的韓志薫）正靠在長椅上，對著你揚起一個極其爽朗、帶著勝負欲的笑容。他挑了挑眉，用口型對你說：「喂，轉校生，你果然沒讓我失望。」</p>
+            <button class="next-chapter-btn" onclick="navigateToHouse('GRYFFINDOR')">[ 走向葛來分多長桌，正式接受此命運 ]</button>
+        </div>
+
+        <!-- 🐍 史萊哲林 -->
+        <div id="declare-SLYTHERIN" style="display: none;">
+            <h3>🐍 宣告二：史萊哲林 (Slytherin)</h3>
+            <blockquote style="border-left-color: #7ee787;">「——史萊哲林！」</blockquote>
+            <p>餐桌那端傳來的是一陣極其克制、優雅，卻帶著金屬般冰冷質感的掌聲。 穿著綠黑色長袍的巫師們微微頷首。你轉過頭，看見長桌角落的韓振。他修長的手指依然把玩著那枚純銀戒指，眼神深邃、在這片充滿利益審視的冷調氛圍裡，隔著搖曳的燭火與銀器微光，無比溫和地接住了你有些侷促的視線。</p>
+            <button class="next-chapter-btn" onclick="navigateToHouse('SLYTHERIN')">[ 走向史萊哲林長桌，正式接受此命運 ]</button>
+        </div>
+
+        <!-- 🦅 雷文克勞 -->
+        <div id="declare-RAVENCLAW" style="display: none;">
+            <h3>🦅 宣告三：雷文克勞 (Ravenclaw)</h3>
+            <blockquote style="border-left-color: #79c0ff;">「——雷文克勞！」</blockquote>
+            <p>青銅鷹的旗幟在半空中微微飄動，長桌上傳來的是一陣極有條理、安靜卻尊重的掌聲。</p>
+            <p>那裡坐著的人，每個人編排前都堆著厚厚的羊皮紙。淺棕色微捲短髮的崔英宰與老么李炅潣正安靜地坐在那 loyalty 裡，他們合上了膝頭的書，那雙冷靜、慢熱的明澈眼睛牢牢鎖定著你。當你走過去時，他們將身邊那個最安靜、最適合看書的空位，默默地幫你拉開了一寸。</p>
+            <button class="next-chapter-btn" onclick="navigateToHouse('RAVENCLAW')">[ 走向雷文克勞長桌，正式接受此命運 ]</button>
+        </div>
+
+        <!-- 🦡 赫夫帕夫 -->
+        <div id="declare-HUFFLEPUFF" style="display: none;">
+            <h3>🦡 宣告四：赫夫帕夫 (Hufflepuff)</h3>
+            <blockquote style="border-left-color: #dfcf9f;">「——赫夫帕夫！」</blockquote>
+            <p>那是整個大禮堂裡最溫暖、最沒有隔閡的歡呼聲。穿著黃黑色長袍的學生們幾乎是毫無防備地朝你湧了過來，手裡塞滿了剛從廚房拿出來的熱騰騰的南瓜餡餅。申惟正站在長桌的最前端，那雙清冷的眼此時盛滿了最純粹的善意。他溫柔地接過你心中沈重的行李箱，手指不經意擦過你微涼的皮膚，聲音很輕，卻帶著讓人卸下所有防備的踏實感：「長途旅行辛苦了。我們的交誼廳在廚房旁邊，進去吧，那裡很暖和。」</p>
+            <button class="next-chapter-btn" onclick="navigateToHouse('HUFFLEPUFF')">[ 走向赫夫帕夫長桌，正式接受此命運 ]</button>
+        </div>
+
+        <button class="option-btn" onclick="resetSortingQuiz()" style="text-align:center; font-size:0.9em; opacity:0.6; margin-top: 30px;">[ 感覺不太對……我想閉上眼，請求分類帽重新聆聽我的靈魂 ]</button>
+    </div>
+
+</div>
+
+<!-- 🎭 彈窗系統 -->
+<div class="modal-popup" id="systemModal" onclick="closeSystemModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div id="modal-title-node" style="color:#dfcf9f; font-weight:bold; font-size:1.1em; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:12px; text-align:center; letter-spacing:1px;"></div>
+        <div id="modal-body-node" style="font-size:0.95em; line-height:1.6; color:#c9d1d9;"></div>
+        <button class="sidebar-btn" style="text-align:center; margin-top:15px; background-color:#21262d; color:#fff;" onclick="closeSystemModal()">蓋上羊皮紙</button>
+    </div>
+</div>
+
+<script>
+    // ⚙️ 底層全域資料庫初始化
+    let g_PlayerName = localStorage.getItem('Hogwarts_PlayerName') || "新巫師"; 
+    let g_Bloodline   = localStorage.getItem('Hogwarts_Bloodline') || ""; 
+    let g_Wallet      = parseInt(localStorage.getItem('Hogwarts_Wallet')) || 53; 
+    let g_Bank        = parseInt(localStorage.getItem('Hogwarts_Gringotts')) || parseInt(localStorage.getItem('Hogwarts_Bank')) || 500;
+    let g_House       = localStorage.getItem('Hogwarts_House') || ""; 
+
+    let quizAnswers = { q1: "", q2: "", q3: "", q4: "", q5: "" };
+
+    const BLOODLINE_MATRIX = {
+        "pure":   { mastery: 25, stamina: 22, wisdom: 22, emotion: 21, label: "💎 尊貴純血" },
+        "mixed":  { mastery: 23, stamina: 23, wisdom: 23, emotion: 23, label: "⏳ 自由混血" },
+        "muggle": { mastery: 21, stamina: 24, wisdom: 24, emotion: 24, label: "🔌 麻瓜出身" }
+    };
+
+    window.onload = function() {
+        // 🔒 防止上一頁作弊機制
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+            alert("『分類帽已落到你的頭頂，命運在交匯，此處不容許時間倒流。』");
+        });
+
+        // 🛡️ 進度安全檢測
+        let currentProgress = localStorage.getItem('Hogwarts_Progress') || "1-1";
+        if (["1_6_gryffindor", "1_6_ravenclaw", "1_6_slytherin", "1_6_hufflepuff", "1-7"].includes(currentProgress)) {
+            alert("『你已在學籍檔案中完成了分類儀式，無法再次干擾分院帽。』");
+            window.location.replace(g_House ? `1_6${g_House.toLowerCase()}.html` : "index.html");
+            return;
+        }
+
+        localStorage.setItem('Hogwarts_Progress', "1-6");
+
+        // 如果完全沒有設定血統，跳轉至備用安全島初始化，否則正常進行
+        if (!g_Bloodline) {
+            document.getElementById('scene-intro').classList.remove('active');
+            document.getElementById('scene-setup').classList.add('active');
+        }
+
+        updatePanelUI();
+    };
+
+    // 🔮 安全島專用初始化函式（補全原程式漏掉的邏輯）
+    function initGame(chosenBlood) {
+        g_Bloodline = chosenBlood;
+        localStorage.setItem('Hogwarts_Bloodline', chosenBlood);
+        updatePanelUI();
+        changeScene('scene-setup', 'scene-intro');
+    }
+
+    // 📊 更新側邊狀態欄 UI
+    function updatePanelUI() {
+        document.getElementById('panel-username').innerText = g_PlayerName;
+        
+        // 學院學籍顯示
+        const houseMap = { "GRYFFINDOR": "葛萊分多 🦁", "RAVENCLAW": "雷文克勞 🦅", "SLYTHERIN": "史萊哲林 🐍", "HUFFLEPUFF": "赫夫帕夫 🦡" };
+        document.getElementById('panel-house-display').innerText = houseMap[g_House] || "⏳ 尚未分院 (1-6儀式解鎖)";
+
+        // 血統與屬性矩陣映射
+        let bKey = "mixed"; // 預設混血
+        if (g_Bloodline === "pure" || g_Bloodline === "純血") bKey = "pure";
+        if (g_Bloodline === "muggle" || g_Bloodline === "麻瓜") bKey = "muggle";
+
+        const currentBloodData = BLOODLINE_MATRIX[bKey];
+        document.getElementById('panel-blood').innerText = currentBloodData.label;
+
+        // 載入 localStorage 或基礎屬性
+        document.getElementById('panel-mastery').innerText = localStorage.getItem('Hogwarts_Stat_Mastery') || currentBloodData.mastery;
+        document.getElementById('panel-stamina').innerText = localStorage.getItem('Hogwarts_Stat_Stamina') || currentBloodData.stamina;
+        document.getElementById('panel-wisdom').innerText  = localStorage.getItem('Hogwarts_Stat_Wisdom')  || currentBloodData.wisdom;
+        document.getElementById('panel-emotion').innerText = localStorage.getItem('Hogwarts_Stat_Emotion') || currentBloodData.emotion;
+        
+        document.getElementById('panel-wallet').innerText = g_Wallet;
+        document.getElementById('panel-bank').innerText = g_Bank;
+    }
+
+    // ☰ 狀態欄開關
+    function toggleSidebar() {
+        let panel = document.getElementById('sidebarPanel');
+        let overlay = document.getElementById('sidebarOverlay');
+        let isOpen = panel.classList.contains('open');
+        
+        panel.classList.toggle('open', !isOpen);
+        overlay.style.display = isOpen ? 'none' : 'block';
+    }
+
+    // 🎬 場景切換器
+    function changeScene(currentId, nextId) {
+        document.getElementById(currentId).classList.remove('active');
+        document.getElementById(currentId).style.display = 'none'; // 強制相容原本的 display 控制
+        
+        let nextScene = document.getElementById(nextId);
+        nextScene.classList.add('active');
+        nextScene.style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    // 🔘 選擇答案
+    function selectOption(btnElement, questionKey, houseValue) {
+        let options = document.getElementsByClassName(questionKey + '-opt');
+        for (let opt of options) {
+            opt.classList.remove('selected');
+        }
+        btnElement.classList.add('selected');
+        quizAnswers[questionKey] = houseValue;
+
+        let confirmBtn = document.getElementById('btn-confirm-' + questionKey);
+        if (confirmBtn) confirmBtn.style.display = 'block';
+    }
+
+    // 🔒 遞交單題答案
+    function commitQuestion(questionKey, currentScene, nextScene) {
+        if (!quizAnswers[questionKey]) {
+            alert("『命運不接受空白的回應。』請先點選一個符合你潛意識的切片。");
+            return;
+        }
+        changeScene(currentScene, nextScene);
+    }
+
+    // ⚖️ 計算分院權重（含血統攔截機制）
+    function calculateHouseSorting() {
+        if (!quizAnswers.q5) {
+            alert("『命運不接受空白的回應。』請先完成最後一項靈魂拷問。");
+            return;
+        }
+
+        let scores = { GRYFFINDOR: 0, SLYTHERIN: 0, RAVENCLAW: 0, HUFFLEPUFF: 0 };
+        for (let key in quizAnswers) {
+            let selectedHouse = quizAnswers[key];
+            if (scores[selectedHouse] !== undefined) scores[selectedHouse]++;
+        }
+
+        // 排序分數最高的學院
+        let sortedHouses = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+        let finalHouse = sortedHouses[0];
+
+        // 🐍 史萊哲林的血統防線機制
+        let isNotPure = (g_Bloodline !== "pure" && g_Bloodline !== "純血");
+        if (finalHouse === "SLYTHERIN" && isNotPure) {
+            let interceptor = document.getElementById('bloodline-intercept-text');
+            interceptor.style.display = 'block';
+            interceptor.innerText = "『噢，不……雖然你很有野心與利己的清醒，但這裡的冰冷地牢不屬於你的血脈……』";
+            finalHouse = sortedHouses[1]; // 順延至最高分第二順位學院
+        } else {
+            document.getElementById('bloodline-intercept-text').style.display = 'none';
+        }
+
+        // 隱藏所有學院宣告，僅顯示最終判定
+        ["GRYFFINDOR", "SLYTHERIN", "RAVENCLAW", "HUFFLEPUFF"].forEach(h => {
+            document.getElementById('declare-' + h).style.display = 'none';
+        });
+
+        document.getElementById('declare-' + finalHouse).style.display = 'block';
+        changeScene('scene-q5', 'scene-sorting-result');
+    }
+
+    // 🔄 重新測試
+    function resetSortingQuiz() {
+        quizAnswers = { q1: "", q2: "", q3: "", q4: "", q5: "" };
+        let allOptBtns = document.getElementsByClassName('option-btn');
+        for (let btn of allOptBtns) {
+            btn.classList.remove('selected');
+        }
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById('btn-confirm-q' + i).style.display = 'none';
+        }
+        changeScene('scene-sorting-result', 'scene-q1');
+    }
+
+    // 🚪 走向長桌與網頁分流
+    function navigateToHouse(chosenHouse) {
+        localStorage.setItem('Hogwarts_House', chosenHouse);
+        localStorage.setItem('Hogwarts_Progress', "1_6_" + chosenHouse.toLowerCase());
+        window.location.replace(`1_6${chosenHouse.toLowerCase()}.html`);
+    }
+
+    // 📖 系統功能彈窗與跳轉
+    function openSystemModal(type) {
+        toggleSidebar(); 
+        
+        if (type === 'diary') { window.location.href = "diary.html"; return; }
+        if (type === 'guide') { window.location.href = "intro.html"; return; }
+
+        let titleNode = document.getElementById('modal-title-node');
+        let bodyNode = document.getElementById('modal-body-node');
+        
+        if (type === 'archive') {
+            titleNode.innerText = "⏳ 舊日魔法檔案";
+            bodyNode.innerHTML = `
+                <p style="text-align:center; color:#8b949e;">— 大廳記憶庫歷史點 —</p>
+                <div style="opacity:0.4; text-align:center; margin-top:10px;">• 1-1 入學通知書 (過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-2 巫師與麻瓜 (過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-3 斜角巷置辦 (過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-4 九又四分之三月台 (過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-5 霍格華茲特快車 (過關)</div>
+                <div style="opacity:1; text-align:center; color:#dfcf9f; font-weight:bold;">• 1-6 分類儀式現場 (當前主線)</div>
+            `;
+        }
+        document.getElementById('systemModal').style.display = 'flex';
+    }
+
+    function closeSystemModal() {
+        document.getElementById('systemModal').style.display = 'none';
+    }
+</script>
+</body>
+</html>
