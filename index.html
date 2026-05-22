@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hogwarts School for TWS - Welcome</title>
+    <style>
+        /* 🌌 Haniii 導演專屬：古典英倫深夜魔法美學 */
+        body {
+            background-color: #0b0e14;
+            color: #cbd5e1;
+            font-family: "Georgia", "Times New Roman", "華康parse等體", serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* 📜 羊皮紙核心卡片容器 */
+        .portal-card {
+            max-width: 500px;
+            width: 100%;
+            background-color: #151922;
+            border: 1px solid #2a313d;
+            border-top: 4px solid #dfcf9f; /* 古典金銅色頂邊 */
+            border-radius: 12px;
+            padding: 35px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-family: "Georgia", serif;
+            color: #dfcf9f;
+            font-size: 1.9em;
+            margin: 0 0 5px 0;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(223, 207, 159, 0.2);
+        }
+
+        .subtitle {
+            color: #8b949e;
+            font-size: 0.85em;
+            letter-spacing: 1px;
+            margin-bottom: 30px;
+        }
+
+        /* 🔮 手機黃金比例按鈕 */
+        .menu-btn {
+            display: block;
+            width: 100%;
+            min-height: 52px;
+            padding: 12px;
+            margin: 12px 0;
+            font-size: 1em;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 【開啟新局】經典霍格華茲翠綠 */
+        .btn-new {
+            background-color: #0a4d26;
+            color: #f4ecd8;
+            border: 1px solid #2ea44f;
+        }
+
+        /* 【繼續、日記、指南】古典深金銅與夜空灰藍 */
+        .btn-old {
+            background-color: #1f242c;
+            color: #dfcf9f;
+            border: 1px solid #8b7355;
+        }
+
+        .btn-sub {
+            background-color: #161b22;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            font-size: 0.95em;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+
+        /* 📜 歷史檔案面板（章節選擇） */
+        .archive-panel {
+            display: none;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #30363d;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .node-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .node-btn {
+            background-color: #1a2332;
+            color: #c9d1d9;
+            border: 1px solid #2d3d54;
+            padding: 14px 8px;
+            font-size: 0.85em;
+            border-radius: 6px;
+            cursor: pointer;
+            min-height: 45px;
+            box-sizing: border-box;
+        }
+
+        /* 🔒 灰色鎖定 */
+        .node-btn.locked {
+            opacity: 0.25;
+            cursor: not-allowed !important;
+            background-color: #11141a !important;
+            color: #6e7681 !important;
+            border-color: #21262d !important;
+        }
+
+        /* 🎭 懸浮遮罩彈窗（僅保留巫師日記面板） */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            max-width: 440px;
+            width: 100%;
+            padding: 25px;
+            box-sizing: border-box;
+            text-align: left;
+            animation: fadeIn 0.3s ease-in-out;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-title {
+            color: #dfcf9f;
+            font-size: 1.15em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .modal-body {
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: #c9d1d9;
+        }
+
+        .close-modal-btn {
+            display: block;
+            width: 100%;
+            background-color: #21262d;
+            color: #cbd5e1;
+            border: 1px solid #30363d;
+            padding: 12px;
+            margin-top: 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* 👑 底部金色小字 */
+        .footer-info {
+            margin-top: 35px;
+            font-size: 0.75em;
+            color: #8b949e;
+            line-height: 1.5;
+        }
+        .author-tag {
+            color: #dfcf9f;
+            font-weight: bold;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="portal-card">
+        <h1>Hogwarts School for TWS</h1>
+        <div class="subtitle">第一章：入學儀式 • 互動文遊大廳</div>
+
+        <button class="menu-btn btn-new" onclick="startNewGame()">✦ 開啟全新入學儀式 ✦</button>
+        <button class="menu-btn btn-old" onclick="continueJourney()">⏳ 繼續未完的魔法旅程</button>
+        
+        <button class="menu-btn btn-sub" onclick="openDiaryModal()">📖 開啟《巫師日記》面板</button>
+        
+        <button class="menu-btn btn-sub" onclick="window.location.href='intro.html'">🔮 閱讀《入學指南》遊戲介紹</button>
+        
+        <button class="menu-btn btn-sub" style="background-color: #11141a; color: #8b949e; border-color: #21262d;" onclick="toggleArchivePanel()">📜 翻開舊日魔法檔案 (歷史節點)</button>
+
+        <div class="archive-panel" id="archivePanel">
+            <div style="font-size: 0.8em; color: #8b949e;">— 容器已記錄的時空節點 —</div>
+            <div class="node-grid">
+                <button class="node-btn" id="node1_1" onclick="jumpToNode('chapter1_1.html')">1-1 入學通知</button>
+                <button class="node-btn locked" id="node1_2" onclick="jumpToNode('chapter1_2.html')">1-2 巫師麻瓜 🔒</button>
+                <button class="node-btn locked" id="node1_3" onclick="jumpToNode('chapter1_3.html')">1-3 斜角巷 🔒</button>
+                <button class="node-btn locked" id="node1_4" onclick="jumpToNode('chapter1_4.html')">1-4 九又四分之三 🔒</button>
+            </div>
+        </div>
+
+        <div class="footer-info">
+            <div>當前羊皮紙瀏覽人次：<span id="viewCount" style="color: #58a6ff; font-weight: bold;">0</span> 次</div>
+            <div style="margin-top: 4px;">&copy; Hogwarts School for TWS. All Rights Reserved.</div>
+            <div class="author-tag">故事二創作者：haniii</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="diaryModal">
+        <div class="modal-content">
+            <div class="modal-title">📖 巫師靈魂日記</div>
+            <div class="modal-body" id="diaryBody"></div>
+            <button class="close-modal-btn" onclick="closeModal('diaryModal')">蓋上日記</button>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            // 1. 瀏覽人次增長
+            let count = localStorage.getItem('Hogwarts_ViewCount') || 134;
+            count = parseInt(count) + 1;
+            localStorage.setItem('Hogwarts_ViewCount', count);
+            document.getElementById('viewCount').innerText = count;
+
+            // 2. 檢查歷史進度解鎖對應的灰色按鈕
+            checkPlayerProgress();
+        };
+
+        // 🧙 安全解鎖新局跳轉
+        function startNewGame() {
+            if(confirm("確定要抹除容器現有的記憶，重新建立一份靈魂檔案嗎？（舊進度與日記數據將被焚毀！）")) {
+                let viewCount = localStorage.getItem('Hogwarts_ViewCount');
+                
+                localStorage.removeItem('Hogwarts_Progress');
+                localStorage.removeItem('Hogwarts_PlayerName');
+                localStorage.removeItem('Hogwarts_Gender');
+                localStorage.removeItem('Hogwarts_Birthday');
+                localStorage.removeItem('Hogwarts_Bloodline');
+                localStorage.removeItem('Hogwarts_Wand_Wood');
+                localStorage.removeItem('Hogwarts_Wand_Core');
+                localStorage.removeItem('Hogwarts_Wand_Length');
+                localStorage.removeItem('Hogwarts_Wand_Flexibility');
+                localStorage.removeItem('Hogwarts_Pet');
+                localStorage.removeItem('Hogwarts_Broom');
+                localStorage.removeItem('Hogwarts_Wallet');
+                localStorage.removeItem('Hogwarts_Gringotts');
+                localStorage.removeItem('Hogwarts_Stat_熟練');
+                localStorage.removeItem('Hogwarts_Stat_體力');
+                localStorage.removeItem('Hogwarts_Stat_智慧');
+                localStorage.removeItem('Hogwarts_Stat_情感');
+
+                localStorage.setItem('Hogwarts_Progress', "1-1");
+                window.location.replace("chapter1_1.html");
+            }
+        }
+
+        // ⏳ 一鍵續玩直接傳送歸位
+        function continueJourney() {
+            let currentProgress = localStorage.getItem('Hogwarts_Progress');
+
+            if (!currentProgress || currentProgress === "1-1") {
+                alert("『時空之鏡中尚未留下你的靈魂烙印，為你開啟全新入學儀式。』");
+                window.location.replace("chapter1_1.html");
+                return;
+            }
+
+            alert("『正在為你重塑時空，傳送回上次離別的節點...』");
+            
+            if (currentProgress === "1-2") {
+                window.location.replace("chapter1_2.html");
+            } else if (currentProgress === "1-3") {
+                window.location.replace("chapter1_3.html");
+            } else if (currentProgress === "1-4") {
+                window.location.replace("chapter1_4.html");
+            } else if (currentProgress === "1-5") {
+                window.location.replace("chapter1_5.html"); 
+            } else {
+                toggleArchivePanel();
+            }
+        }
+
+        // 解除歷史節點鎖
+        function checkPlayerProgress() {
+            let progress = localStorage.getItem('Hogwarts_Progress') || "1-1";
+
+            if(["1-2", "1-3", "1-4", "1-5"].includes(progress)) {
+                document.getElementById('node1_2').classList.remove('locked');
+            }
+            if(["1-3", "1-4", "1-5"].includes(progress)) {
+                document.getElementById('node1_3').classList.remove('locked');
+            }
+            if(["1-4", "1-5"].includes(progress)) {
+                document.getElementById('node1_4').classList.remove('locked');
+            }
+        }
+
+        // 📖 即時解析日記變數
+        function openDiaryModal() {
+            let name = localStorage.getItem('Hogwarts_PlayerName') || "尚未落筆簽署";
+            let blood = localStorage.getItem('Hogwarts_Bloodline') || "未知（未解鎖 1-2）";
+            let progress = localStorage.getItem('Hogwarts_Progress') || "1-1";
+            let wallet = localStorage.getItem('Hogwarts_Wallet') || "0";
+            let gringotts = localStorage.getItem('Hogwarts_Bank') || "0";
+            let wand = localStorage.getItem('Hogwarts_Wand_Wood') ? 
+                (localStorage.getItem('Hogwarts_Wand_Wood') + "木，" + localStorage.getItem('Hogwarts_Wand_Core') + "心") : "尚未挑選（未解鎖 1-3）";
+
+            if(blood === "pure") blood = "✨ 尊貴純血 (Pure-Blood)";
+            if(blood === "mixed") blood = "⏳ 自由混血 (Half-Blood)";
+            if(blood === "muggle") blood = "🪵 麻瓜出身 (Muggle-Born)";
+
+            let progressText = "1-1 入學通知書";
+            if(progress === "1-2") progressText = "1-2 巫師與麻瓜";
+            if(progress === "1-3") progressText = "1-3 斜角巷置辦";
+            if(progress === "1-4") progressText = "1-4 九又四分之三月台";
+            if(progress === "1-5") progressText = "1-5 霍格華茲特快車";
+
+            let html = `
+                <div style="margin-bottom: 12px;"><strong>🧙 巫師姓名：</strong> <span style="color: #dfcf9f;">${name}</span></div>
+                <div style="margin-bottom: 12px;"><strong>🩸 靈魂血統：</strong> <span>${blood}</span></div>
+                <div style="margin-bottom: 12px;"><strong>⏳ 當前時空：</strong> <span style="color: #58a6ff;">${progressText}</span></div>
+                <div style="margin-bottom: 12px;"><strong>🪄 契合魔杖：</strong> <span>${wand}</span></div>
+                <div style="border-top: 1px solid #30363d; margin-top: 15px; padding-top: 10px;">
+                    <div style="color: #8b949e; font-size: 0.85em; margin-bottom: 5px;">💰 金融資產：</div>
+                    <div>• 隨身錢袋： <span style="color: #dfcf9f;">${wallet}</span> 加隆</div>
+                    <div>• 金庫餘額： <span style="color: #dfcf9f;">${gringotts}</span> 加隆</div>
+                </div>
+            `;
+            document.getElementById('diaryBody').innerHTML = html;
+            document.getElementById('diaryModal').style.display = 'flex';
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function toggleArchivePanel() { let panel = document.getElementById('archivePanel'); panel.style.display = (panel.style.display === "block") ? "none" : "block"; }
+        function jumpToNode(pageUrl) { if(event.target.classList.contains('locked')) { alert("『命運的墨水尚未暈開至此。』"); return; } window.location.replace(pageUrl); }
+    </script>
+</body>
+</html>
