@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霍格華茲：轉校生的起點 - 入學通知書</title>
+    <style>
+        /* 🌌 Haniii 導演專屬：古典英倫深夜魔法美學 */
+        body {
+            background-color: #0b0e14;
+            color: #c9d1d9;
+            font-family: "Georgia", "Times New Roman", "PingFang TC", "Heiti TC", sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ☰ 頂端常駐漢堡導航欄 */
+        .top-nav-bar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 55px;
+            background-color: rgba(11, 14, 20, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #2a313d;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 900;
+        }
+
+        .menu-toggle-btn {
+            background: none; border: none;
+            color: #dfcf9f; font-size: 24px;
+            cursor: pointer; padding: 5px 10px;
+            display: flex; align-items: center;
+        }
+
+        /* 🏰 左側常駐狀態欄抽屜 */
+        .sidebar-panel {
+            position: fixed;
+            top: 0; left: -280px; width: 280px; height: 100%;
+            background-color: #151922; border-right: 1px solid #2a313d;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+            z-index: 999;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 70px 20px 20px 20px; box-sizing: border-box;
+        }
+        .sidebar-panel.open { left: 0; }
+        
+        .sidebar-title {
+            color: #dfcf9f; font-size: 1.1em; font-weight: bold;
+            border-bottom: 1px dashed #30363d; padding-bottom: 8px; margin-bottom: 15px;
+        }
+
+        .sidebar-btn {
+            width: 100%; background-color: #1f242c; color: #c9d1d9;
+            border: 1px solid #2d3d54; padding: 12px; margin: 10px 0;
+            border-radius: 6px; cursor: pointer; font-size: 0.9em; font-weight: bold;
+            text-align: left; transition: all 0.2s;
+        }
+        .sidebar-btn:active { background-color: #223046; border-color: #dfcf9f; }
+
+        .sidebar-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5); z-index: 998;
+        }
+
+        /* 🎬 主要劇情文字容器 */
+        .game-wrapper {
+            max-width: 650px; width: 100%;
+            background-color: #151922; border: 1px solid #2a313d; border-radius: 12px;
+            padding: 30px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            box-sizing: border-box; margin-top: 60px;
+            transition: filter 0.5s ease;
+        }
+
+        .story-text { font-size: 1.05em; line-height: 1.8; color: #e1e7ed; animation: fadeInText 1.5s ease-in-out; }
+        p { margin-bottom: 18px; text-align: justify; }
+
+        /* 📥 全螢幕懸浮遮罩層（拆信舞台） */
+        .envelope-container-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(5, 7, 10, 0.9); z-index: 1000;
+            justify-content: center; 
+            align-items: center; /* 初始狀態讓信封居中 */
+            padding: 20px; box-sizing: border-box;
+            backdrop-filter: blur(12px);
+            overflow-y: auto; /* 💥 核心關鍵：允許當內容過長時，整個遮罩層可以順暢下滑 */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ✉️ 3D 魔法信封主殼 */
+        .magic-envelope {
+            position: relative;
+            width: 100%; max-width: 420px; height: 260px;
+            background-color: #f2ebd9; 
+            border-radius: 6px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            cursor: pointer;
+            perspective: 1000px;
+            transition: transform 0.4s ease, opacity 0.3s;
+        }
+
+        /* 信封背部線條 */
+        .magic-envelope::before {
+            content: ''; position: absolute;
+            bottom: 0; left: 0; width: 0; height: 0;
+            border-left: 210px solid transparent;
+            border-right: 210px solid transparent;
+            border-bottom: 130px solid #ebdcb9; 
+            border-radius: 0 0 6px 6px;
+            z-index: 2; pointer-events: none;
+        }
+        @media(max-width: 450px) {
+            .magic-envelope::before {
+                border-left-width: calc(50vw - 20px);
+                border-right-width: calc(50vw - 20px);
+            }
+        }
+
+        /* 📐 信封上蓋 */
+        .envelope-flap {
+            position: absolute; top: 0; left: 0; width: 0; height: 0;
+            border-left: 210px solid transparent;
+            border-right: 210px solid transparent;
+            border-top: 135px solid #ebdcb9; 
+            transform-origin: top center;
+            z-index: 4; 
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @media(max-width: 450px) {
+            .envelope-flap {
+                border-left-width: calc(50vw - 20px);
+                border-right-width: calc(50vw - 20px);
+            }
+        }
+
+        /* 🩸 紅色火漆紅蠟封 */
+        .h-wax-seal {
+            position: absolute;
+            top: 110px; left: 50%;
+            transform: translateX(-50%);
+            width: 55px; height: 55px;
+            background-color: #a61c1c; 
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 0 8px rgba(0,0,0,0.4);
+            z-index: 5;
+            display: flex; align-items: center; justify-content: center;
+            color: #ebdcb9; font-family: "Georgia", serif;
+            font-size: 24px; font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+            border: 2px solid #911616;
+            transition: all 0.3s ease;
+        }
+
+        /* 霍格華茲徽章 */
+        .envelope-crest {
+            position: absolute; top: 35px; left: 50%; transform: translateX(-50%);
+            width: 65px; height: 75px;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Hogwarts_coat_of_arms.svg/800px-Hogwarts_coat_of_arms.svg.png') no-repeat center center;
+            background-size: contain;
+            opacity: 0.85; z-index: 3; pointer-events: none;
+        }
+
+        /* 📜 內部羊皮紙：物理定位優化重組防線 */
+        .slid-out-letter {
+            display: none; /* 初始完全隱藏，開蓋後由 JS 轉為 block 釋放 */
+            width: 100%; max-width: 500px;
+            background-color: #f4ecd8; color: #0d2e1b;
+            border: 2px solid #dfcf9f; border-radius: 8px;
+            padding: 30px 20px; box-sizing: border-box;
+            box-shadow: inset 0 0 20px rgba(139, 115, 85, 0.3), 0 10px 30px rgba(0,0,0,0.5);
+            margin: 20px auto; /* 💥 讓信件自然在全螢幕垂直流中排版，可以順暢滑到底部 */
+            animation: fadeInText 0.6s ease-in-out;
+        }
+
+        .magic-envelope.opened { display: none; } /* 💥 天規修正：信封開蓋完成後直接隱藏，將空間100%留給羊皮紙 */
+
+        /* 輸入框與按鈕 */
+        .archive-form { margin-top: 20px; border-top: 2px solid #0a4d26; padding-top: 15px; }
+        .form-title { font-weight: bold; color: #0a4d26; margin-bottom: 12px; font-size: 1em; }
+        .input-group { margin-bottom: 15px; display: flex; align-items: center; }
+        .input-group label { width: 110px; font-weight: bold; font-size: 0.85em; color: #0d2e1b; }
+        .magic-input {
+            background: transparent; border: none; border-bottom: 1px solid #0a4d26;
+            color: #0d2e1b; font-size: 1em; padding: 4px; width: 100%; outline: none;
+        }
+        .magic-input:focus { background-color: rgba(10, 77, 38, 0.04); border-bottom-width: 2px; }
+        .radio-group label { width: auto; margin-right: 15px; cursor: pointer; color: #0d2e1b; display: inline-flex; align-items: center; }
+        .radio-group input { margin-right: 4px; }
+        .select-date { background: transparent; border: 1px solid #0a4d26; color: #0d2e1b; padding: 6px; border-radius: 4px; margin-right: 5px; font-family: inherit; font-size: 0.9em; }
+
+        .submit-btn {
+            display: block; width: 100%; background-color: #0a4d26; color: #f4ecd8;
+            border: 1px solid #07351a; border-radius: 5px; padding: 14px;
+            font-size: 1.05em; font-weight: bold; cursor: pointer; margin-top: 15px;
+            box-sizing: border-box;
+            -webkit-appearance: none; /* 消除 iOS 按鈕預設圓角變色 */
+        }
+
+        /* 🎭 彈窗 */
+        .modal-popup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); z-index: 2000;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+        }
+        .modal-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; max-width: 420px; width: 100%; padding: 25px; }
+
+        @keyframes fadeInText { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <!-- 💥 這裡已精準修正為古典魔法金銅色字樣 -->
+    <div style="color: #dfcf9f; font-weight: bold; margin-left: 10px; font-size: 0.9em; letter-spacing: 1px;">🏰 HOGWARTS SYSTEM</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-panel" id="sidebarPanel">
+    <div class="sidebar-title">📜 轉校生常駐狀態</div>
+    <button class="sidebar-btn" onclick="openSystemModal('diary')">📖 開啟《巫師日記》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('archive')">⏳ 翻開《舊日魔法檔案》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('guide')">🔮 查閱《入學指南介紹》</button>
+    <button class="sidebar-btn" style="color: #e06c75; margin-top: 30px; border-color: #4c2929;" onclick="resetToMain大廳()">🚪 逃離並退回遊戲大廳</button>
+</div>
+
+<div class="game-wrapper" id="mainGameCard">
+    <div class="story-text">
+        <h2>📖 1-1 入學通知書</h2>
+        <p>午後的蟬鳴黏稠得像要化開一樣。屋子裡有些悶熱，風扇一下一下遲鈍地轉著，帶不走空氣裡屬於夏天的浮躁。</p>
+        <p>你正靠在桌邊昏昏欲睡，一陣有些急促、沉重的翅膀拍擊聲突然打破了寂靜。</p>
+        <p>一隻碩大的穀倉鴞正停在你的窗台上。它那雙圓滾滾的夜眼在白晝裡顯著有些疏離，正微微歪著頭盯著你。在它的鐵青色喙裡，銜著一封厚重的、泛著淡淡羊皮紙香氣的信。</p>
+        <p>你推開窗，它便順從地鬆開口，隨後優雅地振翅飛走，在夏日的熱浪中留下一抹白色的剪影。</p>
+        <p>信封是用沉甸甸的翠綠色墨水寫的，沒有貼郵票。你將它翻過來，一枚厚重的、帶有霍格華茲盾牌紋章的紫色蠟封正完好地黏在封口。</p>
+        <p>你輕輕拆開它。</p>
+    </div>
+
+    <button class="submit-btn" style="background-color: #4a154b; border-color: #6b236d;" onclick="showEnvelopeStage()">
+        ✉️ 拿起案几上的霍格華茲信件 [ 拆閱信件 ]
+    </button>
+</div>
+
+<!-- 📥 全螢幕懸浮層 -->
+<div class="envelope-container-overlay" id="envelopeStageOverlay">
+    
+    <!-- 信封主殼 -->
+    <div class="magic-envelope" id="physicalEnvelope">
+        <div class="envelope-flap"></div>
+        <div class="envelope-crest"></div>
+        <div class="h-wax-seal">H</div> 
+    </div>
+
+    <!-- 📜 獨立的羊皮紙信件 -->
+    <div class="slid-out-letter" id="actualLetter">
+        <div style="font-size: 1.3em; font-weight: bold; text-align: center; color: #0a4d26; margin-bottom: 5px;">霍格華茲魔法學校</div>
+        <div style="font-size: 0.85em; text-align: center; color: #555; font-style: italic; margin-bottom: 20px;">校長：米奈娃·麥 (Minerva McGonagall)</div>
+        
+        <p>親愛的巫師：</p>
+        <p style="text-indent: 2em;">我們很高興通知您，您已獲准於本學年以<strong>四年級轉校生</strong>之身份入學。隨信附上所需書籍與裝備清單。</p>
+        <p style="text-indent: 2em;">學期定於九月一日正式開始。考慮到您的特殊入學情形，我們已派遣學校的鑰匙管理員暨獵場看守——官方接引員<strong>魯霸·海格先生</strong>，於今日啟程前往協助您置辦入學事宜。</p>
+        <p style="text-indent: 2em; margin-bottom: 20px;">請於下方填妥並簽署學籍登記，以確認您已知悉並接受此入學通知。</p>
+
+        <div class="archive-form">
+            <div class="form-title">🔮 【填寫您的新生學籍資訊】</div>
+            <div class="input-group">
+                <label>· 名字 (Name)：</label>
+                <input type="text" id="player-name" class="magic-input" placeholder="例如：哈利" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>· 姓氏 (Surname)：</label>
+                <input type="text" id="player-surname" class="magic-input" placeholder="例如：波特" autocomplete="off">
+            </div>
+            <div class="input-group radio-group">
+                <label style="font-weight: bold;">· 性別 (Gender)：</label>
+                <label><input type="radio" name="gender" value="男生"> 男生</label>
+                <label><input type="radio" name="gender" value="女生"> 女生</label>
+            </div>
+            <div class="input-group">
+                <label>· 誕辰 (Birthday)：</label>
+                <select id="birth-month" class="select-date">
+                    <option value="">月份</option>
+                    <script>for(let i=1; i<=12; i++) document.write(`<option value="${i}月">${i}月</option>`);</script>
+                </select>
+                <select id="birth-day" class="select-date">
+                    <option value="">日期</option>
+                    <script>for(let i=1; i<=31; i++) document.write(`<option value="${i}日">${i}日</option>`);</script>
+                </select>
+            </div>
+
+            <button class="submit-btn" id="final-submit-btn" onclick="submitHogwartsArchive(event)">[ 確認落筆，接受入學 ]</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-popup" id="systemModal" onclick="closeSystemModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div id="modal-title-node" style="color:#dfcf9f; font-weight:bold; font-size:1.1em; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:12px; text-align:center;"></div>
+        <div id="modal-body-node" style="font-size:0.9em; line-height:1.6; color:#c9d1d9;"></div>
+        <button class="sidebar-btn" style="text-align:center; margin-top:15px;" onclick="closeSystemModal()">關閉面板</button>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        localStorage.setItem('Hogwarts_Progress', "1-1");
+
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+            alert("『過去的抉擇已成烙印，收回你的時光器。』");
+        });
+
+        // 動態修正：點擊信封外殼觸發開蓋
+        document.getElementById('physicalEnvelope').addEventListener('click', function(e) {
+            let env = this;
+            if(!env.classList.contains('opened')) {
+                env.classList.add('opened');
+                
+                // 開蓋動畫完畢後，隱藏信封，將懸浮遮罩改為靠頂對齊，讓羊皮紙完整釋放並自由滑動
+                setTimeout(() => {
+                    env.style.display = 'none';
+                    document.getElementById('envelopeStageOverlay').style.alignItems = 'flex-start';
+                    document.getElementById('actualLetter').style.display = 'block';
+                }, 600);
+            }
+        });
+    };
+
+    function toggleSidebar() {
+        let panel = document.getElementById('sidebarPanel');
+        let overlay = document.getElementById('sidebarOverlay');
+        if(panel.classList.contains('open')) {
+            panel.classList.remove('open'); overlay.style.display = 'none';
+        } else {
+            panel.classList.add('open'); overlay.style.display = 'block';
+        }
+    }
+
+    function showEnvelopeStage() {
+        document.getElementById('mainGameCard').style.filter = 'blur(10px)';
+        document.getElementById('envelopeStageOverlay').style.display = 'flex';
+    }
+
+    function submitHogwartsArchive(event) {
+        if (event) {
+            event.stopPropagation();
+        }
+
+        let name = document.getElementById('player-name').value.trim();
+        let surname = document.getElementById('player-surname').value.trim();
+        let genders = document.getElementsByName('gender');
+        let selectedGender = "";
+        for (let i = 0; i < genders.length; i++) {
+            if (genders[i].checked) { selectedGender = genders[i].value; break; }
+        }
+        let month = document.getElementById('birth-month').value;
+        let day = document.getElementById('birth-day').value;
+
+        if (!name || !surname || !selectedGender || !month || !day) {
+            alert("「霍格華茲不接受模糊的簽署。」請將您的姓名、性別與誕生時空填寫完全。");
+            return;
+        }
+
+        let fullName = `${name}·${surname}`;
+        localStorage.setItem('Hogwarts_PlayerName', fullName);
+        localStorage.setItem('Hogwarts_Gender', selectedGender);
+        localStorage.setItem('Hogwarts_Birthday', `${month}${day}`);
+        
+        alert(`✨ 羊皮紙上泛起一陣翠綠微光，【${fullName}】已成功登錄學籍！\n\n系統提示：海格的腳步聲已在門外，即將前往 1-2 章節。`);
+        
+        window.location.replace("chapter1_2.html");
+    }
+
+    function openSystemModal(type) {
+        toggleSidebar(); 
+        if (type === 'diary') { window.location.href = "diary.html"; return; }
+        if (type === 'guide') { window.location.href = "intro.html"; return; }
+
+        let titleNode = document.getElementById('modal-title-node');
+        let bodyNode = document.getElementById('modal-body-node');
+        
+        if(type === 'archive') {
+            titleNode.innerText = "⏳ 舊日魔法檔案";
+            bodyNode.innerHTML = `
+                <p style="text-align:center; color:#8b949e;">目前你正處於最初的時間節點。</p>
+                <div style="opacity:0.4; text-align:center; margin-top:10px;">• 1-1 入學通知書 (當前)</div>
+                <div style="opacity:0.15; text-align:center;">• 1-2 巫師與麻瓜 🔒</div>
+            `;
+        }
+        document.getElementById('systemModal').style.display = 'flex';
+    }
+
+    function closeSystemModal() { document.getElementById('systemModal').style.display = 'none'; }
+    function resetToMain大廳() { if(confirm("確定要暫時中斷進度，退回主大廳嗎？")) { window.location.replace("index.html"); } }
+</script>
+
+</body>
+</html>

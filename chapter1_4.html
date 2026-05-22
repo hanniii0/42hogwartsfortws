@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霍格華茲：轉校生的起點 - 九又四分之三月台</title>
+    <style>
+        /* 🌌 Haniii 導演專屬：古典英倫深夜魔法美學 */
+        body {
+            background-color: #0b0e14;
+            color: #e6edf3;
+            font-family: "Georgia", "Times New Roman", "PingFang TC", "Heiti TC", sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ☰ 頂端全域常駐漢堡導航欄 */
+        .top-nav-bar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 55px;
+            background-color: rgba(11, 14, 20, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #2a313d;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 900;
+        }
+
+        .menu-toggle-btn {
+            background: none; border: none;
+            color: #dfcf9f; font-size: 26px;
+            cursor: pointer; padding: 5px 10px;
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle-btn:active { transform: scale(0.9); }
+
+        /* 🏰 左側全功能常駐狀態欄（抽屜面板） */
+        .sidebar-panel {
+            position: fixed;
+            top: 0; left: -300px; width: 300px; height: 100%;
+            background-color: #151922; border-right: 1px solid #2a313d;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+            z-index: 999;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 70px 20px 20px 20px; box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .sidebar-panel.open { left: 0; }
+
+        /* 側邊欄黑色背景遮罩 */
+        .sidebar-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 998;
+            backdrop-filter: blur(3px);
+        }
+
+        /* 📊 抽屜內嵌：巫師角色狀態檔案卡 */
+        .drawer-status-card {
+            background-color: #1f242c; border: 1px solid #2a313d;
+            border-top: 3px solid #dfcf9f; border-radius: 8px;
+            padding: 15px; margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        .drawer-card-title {
+            font-size: 0.85em; color: #8b949e; letter-spacing: 1px;
+            text-transform: uppercase; border-bottom: 1px solid #21262d;
+            padding-bottom: 6px; margin-bottom: 12px;
+            display: flex; justify-content: space-between;
+        }
+        
+        /* 側邊欄屬性小方格 */
+        .drawer-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .drawer-stat-box {
+            background-color: #151922; padding: 10px 6px; border-radius: 6px;
+            text-align: center; font-size: 0.85em; border: 1px solid #2a313d;
+        }
+        .drawer-stat-name { color: #8b949e; display: block; font-size: 0.8em; margin-bottom: 2px; }
+        .drawer-stat-value { color: #58a6ff; font-weight: bold; font-size: 1.05em; }
+        .money-gold { color: #dfcf9f; text-shadow: 0 0 4px rgba(223, 207, 159, 0.3); }
+
+        .sidebar-title-tag { color: #8b949e; font-size: 0.8em; font-weight: bold; margin-top: 20px; margin-bottom: 5px; display: block; }
+        .sidebar-btn {
+            width: 100%; background-color: #161b22; color: #cbd5e1;
+            border: 1px solid #30363d; padding: 12px; margin: 8px 0;
+            border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold;
+            text-align: left; transition: all 0.2s;
+        }
+        .sidebar-btn:active { background-color: #223046; border-color: #dfcf9f; }
+
+        /* 🎬 主要劇情文字容器 */
+        .game-container {
+            max-width: 680px; width: 100%;
+            background-color: #151922; padding: 35px;
+            border-radius: 12px; border: 1px solid #2a313d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            box-sizing: border-box; margin-top: 75px;
+        }
+        .scene { display: none; }
+        .scene.active { display: block; animation: fadeIn 0.6s ease-in-out; }
+        
+        h2 {
+            color: #79c0ff; border-bottom: 1px solid #2a313d;
+            padding-bottom: 12px; font-weight: 500; margin-top: 0; letter-spacing: 1px;
+        }
+        h3 { color: #dfcf9f; margin-top: 30px; font-size: 1.1em; }
+        p { text-align: justify; color: #cbd5e1; }
+
+        .hud {
+            background-color: #1f242c; padding: 20px; border-radius: 8px;
+            border-left: 4px solid #2ea44f; margin: 25px 0; font-size: 0.95em; line-height: 1.7;
+        }
+
+        /* 🔮 巫師風格劇本選項按鈕 */
+        .option-btn {
+            display: block; width: 100%; padding: 15px 20px; margin: 14px 0;
+            background-color: #1a2332; color: #c9d1d9; border: 1px solid #2d3d54;
+            border-radius: 6px; text-align: left; cursor: pointer;
+            font-size: 1em; font-family: inherit; transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .option-btn:hover {
+            background-color: #223046; border-color: #2ea44f;
+            color: #ffffff; transform: translateX(4px);
+            box-shadow: 0 0 10px rgba(46, 164, 79, 0.2);
+        }
+
+        /* 綠色前進按鈕 */
+        .next-btn { background-color: #0a4d26; color: #ffffff; border: 1px solid #2ea44f; text-align: center; font-weight: bold; margin-top: 25px; }
+        .next-btn:hover { background-color: #116934; border-color: #3fb950; box-shadow: 0 0 15px rgba(63, 185, 80, 0.4); }
+
+        /* ➔ 特製金銅色大跳轉按鈕 */
+        .next-chapter-btn {
+            display: block; width: 100%; padding: 15px 20px;
+            background-color: #8b7355; color: #ffffff; border: 1px solid #6e5940;
+            border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer;
+            margin-top: 30px; box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2); transition: all 0.2s;
+        }
+        .next-chapter-btn:hover { background-color: #a38865; box-shadow: 0 0 15px rgba(163, 136, 101, 0.5); transform: translateY(-2px); }
+
+        blockquote {
+            border-left: 3px solid #dfcf9f; margin: 20px 0; padding: 10px 15px;
+            background-color: #23201a; color: #dfcf9f; font-style: italic; border-radius: 0 6px 6px 0;
+        }
+        small { display: block; margin-top: 4px; line-height: 1.5; }
+
+        /* 🎭 獨立輔助系統彈窗 */
+        .modal-popup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); z-index: 2000;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; max-width: 420px; width: 100%; padding: 25px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div style="color: #dfcf9f; font-weight: bold; margin-left: 8px; font-size: 0.85em; letter-spacing: 1px;">🏰 HOGWARTS SYSTEM</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-panel" id="sidebarPanel">
+    
+    <div class="drawer-status-card">
+        <div class="drawer-card-title">
+            <span>🧙 巫師：<span id="panel-username" style="color:#dfcf9f; font-weight:bold;">讀取中..</span></span>
+        </div>
+        <div class="drawer-card-title" style="border:none; margin-bottom:5px; padding-bottom:0;">
+            <span>🏰 學籍：<span style="color:#79c0ff; font-weight:bold;">四年級轉校生</span></span>
+        </div>
+    </div>
+
+    <div class="sidebar-title-tag">— ⚖️ 靈魂核心特質 —</div>
+    <div class="drawer-status-card">
+        <div class="drawer-stat-grid">
+            <div class="drawer-stat-box"><span class="drawer-stat-name">魔咒熟練</span><span class="drawer-stat-value" id="panel-mastery">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">體力值</span><span class="drawer-stat-value" id="panel-stamina">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">智慧值</span><span class="drawer-stat-value" id="panel-wisdom">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">情感值</span><span class="drawer-stat-value" id="panel-emotion">--</span></div>
+        </div>
+    </div>
+
+    <div class="sidebar-title-tag">— 💰 巫師資產帳本 —</div>
+    <div class="drawer-status-card">
+        <div style="font-size:0.85em; margin-bottom:8px;">血統：<span id="panel-blood" style="color:#79c0ff; font-weight:bold;">讀取中..</span></div>
+        <div style="font-size:0.85em; margin-bottom:8px;">隨身錢袋：<span class="drawer-stat-value money-gold" id="panel-wallet">--</span> 加隆</div>
+        <div style="font-size:0.85em;">古靈閣金庫：<span class="drawer-stat-value money-gold" id="panel-bank">--</span> 加隆</div>
+    </div>
+
+    <div class="sidebar-title-tag">— ⚙️ 系統導航 —</div>
+    <button class="sidebar-btn" onclick="openSystemModal('archive')">⏳ 翻開《舊日魔法檔案》</button>
+    <button class="sidebar-btn" onclick="openSystemModal('guide')">🔮 查閱《入學指南介紹》</button>
+    <button class="sidebar-btn" style="color: #e06c75; margin-top: 20px; border-color: #4c2929;" onclick="resetToMain大廳()">🚪 逃離並退回遊戲大廳</button>
+</div>
+
+<div class="game-container">
+
+    <div id="scene-setup" class="scene">
+        <h2>🔮 初始化你的前置選擇（備用安全島）</h2>
+        <p>檢測到您未攜帶前置數據，請補選您在 1-2 確定的出身血統以初始化檔案面板：</p>
+        <button class="option-btn" onclick="initGame('純血')">💎 傳承純粹的巫師血脈（純血）</button>
+        <button class="option-btn" onclick="initGame('混血')">⏳ 游走於兩個世界的邊緣（混血）</button>
+        <button class="option-btn" onclick="initGame('麻瓜')">🔌 來自毫無魔法的尋常人家（麻瓜出身）</button>
+    </div>
+
+    <div id="scene-platform-intro" class="scene active">
+        <h2>🧱 1-4 九又四分之三月台</h2>
+        <p>跟著海格的腳步，我們來到了熙來攘往的王十字車站。</p>
+        <p>車站裡充斥著皮鞋踏在瓷磚上的啪嗒聲，還有麻瓜們為了趕通勤而顯得冷漠匆忙的交談聲。空氣裡混雜著劣質咖啡與煤煙的黏膩味道。你推著沉重的行李車，緊緊跟著海格那高大得過分的身影。</p>
+        <p>「聽著，」海格停在第九與第十月台之間的一根紅磚石柱前，轉過身低頭看著意，神色顯得有些興奮，「就是這裡了。不存在的月台，也是通往霍格華茲的唯一通道。」</p>
+        <p>你張望著那堵堅硬、冰冷的磚牆，路過的麻瓜甚至差點撞到你的行李車。</p>
+        <p>然而下一秒，海格便推著推車，示意你進入那個不存在的月台——「別害怕，推著車直接走過去，用跑的也行，如果你覺得緊張的話。眼睛一閉，腳步別停下。」</p>
+        
+        <button class="option-btn next-btn" onclick="triggerWallCross()">深吸一口氣，眼睛一閉朝著石柱衝過去</button>
+    </div>
+
+    <div id="scene-wall-loading" class="scene" style="background-color: #000000; text-align: center; padding: 80px 0; border-radius: 8px;">
+        <p style="color: #8b949e; font-style: italic;">（你閉上了雙眼，車站的喧囂與熱浪在耳邊瞬間靜止了...）</p>
+    </div>
+
+    <div id="scene-platform-success" class="scene">
+        <h2>🚂 霍格華茲特快車</h2>
+        <p>穿牆之後，等待你的不是撞牆的痛感，而是正鳴著汽笛、竄著白煙的霍華茲特快車！</p>
+        <p>一輛深紅色的蒸汽火車頭正停在擠滿了人群的月台旁，車身正源源不絕地竄出巨大的白色煙霧，將四周的景物染得有些不真實。月台上到處穿著長袍、提著貓頭鷹籠子的巫師。</p>
+        <p>至於海格，事成之後他便準備離去。他將你推到火車車廂門口，有些不捨地摸了摸他那亂蓬蓬的鬍子。「事成了，我的任務也算完成了。霍格華茲的獵場還有很多事情等著我呢。」</p>
+        <p>在轉身離去前，這個高大的半巨人停下腳步，最後留給玩家一句祝福的話語：</p>
+
+        <h3>【海格的臨別祝福】</h3>
+        <blockquote>
+            <strong>⚠️ 選擇不可逆！</strong> 此期許祝福將在後台讓數值永久 +2。<br>
+            <span style="color:#dfcf9f;">💡 提示：點擊祝福後，你可以隨時拉開左上角 ☰ 狀態欄，查看你的能力發生跳動與疊加！</span>
+        </blockquote>
+
+        <button class="option-btn" onclick="selectBlessing('Mastery')">
+            A：「希望你在霍格華茲的每一堂課都能得心應手，孩子。」<br>
+            <small style="color:#8b949e;">（對魔法的流動產生更清明的感知 → <b>魔咒熟練值 +2</b>）</small>
+        </button>
+        <button class="option-btn" onclick="selectBlessing('Stamina')">
+            B：「祝你擁有一副強健的身骨，魁地奇球場上可需要這個！」<br>
+            <small style="color:#8b949e;">（四肢湧入一絲熱意，旅途的疲憊一掃而空 → <b>體力值 +2</b>）</small>
+        </button>
+        <button class="option-btn" onclick="selectBlessing('Wisdom')">
+            C：「願雷文克勞的青銅鷹能保佑你，多讀點書總是好的。」<br>
+            <small style="color:#8b949e;">（思緒瞬間變得無比清晰，邏輯更為嚴密 → <b>智慧值 +2</b>）</small>
+        </button>
+        <button class="option-btn" onclick="selectBlessing('Emotion')">
+            D：「保持你這顆溫柔赤誠的心，你一定能在這裡交到摯友。」<br>
+            <small style="color:#8b949e;">（胸口感到一陣踏實的溫熱，情感共鳴更深 → <b>情感值 +2</b>）</small>
+        </button>
+    </div>
+
+    <div id="scene-platform-end" class="scene">
+        <h2>🚂 正式前往霍格華茲</h2>
+        <p>在海格溫慢目送下，你搭上了特快車，正式前往霍格華茲。</p>
+        <p>高大的半巨人朝你揮了揮手，龐大的身影逐漸縮小。火車的車輪開始緩緩轉動，發出沉重的哐當聲，月台上的喧囂與夏末的煙塵都在這一刻被遠遠地拋在腦後。</p>
+        <p>你轉過身，提著行李走向狹窄的火車長廊。面板上的能力已經在悄然間發生了不可逆的蛻變，這將是你四年級插班生活的生存基石。</p>
+        
+        <div class="hud" style="border-left-color: #58a6ff;">
+            <strong>📊 狀態更新完畢：</strong><br>
+            你已成功繼承血統初始分，並獲得海格的臨別祝福。數據與進度已在後台永久封裝。
+        </div>
+        
+        <button class="next-chapter-btn" onclick="navigateToChapter1_5()">
+            [ 走入列車長廊，尋找空的包廂 ]
+        </button>
+    </div>
+
+</div>
+
+<div class="modal-popup" id="systemModal" onclick="closeSystemModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div id="modal-title-node" style="color:#dfcf9f; font-weight:bold; font-size:1.1em; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:12px; text-align:center; letter-spacing:1px;"></div>
+        <div id="modal-body-node" style="font-size:0.95em; line-height:1.6; color:#c9d1d9;"></div>
+        <button class="sidebar-btn" style="text-align:center; margin-top:15px; background-color:#21262d;" onclick="closeSystemModal()">關閉面板</button>
+    </div>
+</div>
+
+<script>
+    // ⚙️ 底層全域帳本緩存初始化
+    let g_PlayerName = localStorage.getItem('Hogwarts_PlayerName') || "新巫師"; 
+    let g_Bloodline = localStorage.getItem('Hogwarts_Bloodline') || "";
+    let g_Wallet = parseInt(localStorage.getItem('Hogwarts_Wallet')) || 53; 
+    let g_Bank = parseInt(localStorage.getItem('Hogwarts_Bank')) || 500;
+
+    let g_Mastery = 0; let g_Stamina = 0; let g_Wisdom = 0; let g_Emotion = 0;
+
+    // 🩸 20點扎實分起步 × 三大血統天賦加權矩陣
+    const BLOODLINE_MATRIX = {
+        "純血": { mastery: 25, stamina: 22, wisdom: 22, emotion: 21, bank: 500 },
+        "混血": { mastery: 23, stamina: 23, wisdom: 23, emotion: 23, bank: 500 },
+        "麻瓜": { mastery: 21, stamina: 24, wisdom: 24, emotion: 24, bank: 1000 }
+    };
+
+    // 🖥️ 修正優化：將抽屜拉開的開關移至最上層，確保任何狀態下均可點擊
+    function toggleSidebar() {
+        let panel = document.getElementById('sidebarPanel');
+        let overlay = document.getElementById('sidebarOverlay');
+        if(panel.classList.contains('open')) {
+            panel.classList.remove('open'); overlay.style.display = 'none';
+        } else {
+            panel.classList.add('open'); overlay.style.display = 'block';
+        }
+    }
+
+    window.onload = function() {
+        // 🔒 強力防越獄防線：若進度超前，禁止倒流
+        let currentProgress = localStorage.getItem('Hogwarts_Progress') || "1-1";
+        if (currentProgress !== "1-4" && currentProgress !== "1-3" && currentProgress !== "1-2" && currentProgress !== "1-1") {
+            alert("『時空發生扭曲，你獲得的臨別祝福已刻入靈魂，不容許倒流。』");
+            window.location.replace("chapter1_5.html"); 
+            return;
+        }
+
+        // 打刻當前 1-4 進度通行證
+        localStorage.setItem('Hogwarts_Progress', "1-4");
+
+        // 沒收 Safari 原生歷史堆疊軌跡
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+            alert("『過去的抉擇已成烙印，收回你的時光器。』");
+        });
+
+        // 初始化加載玩家的血統與資料
+        if (g_Bloodline === "") {
+            changeScene('scene-platform-intro', 'scene-setup');
+        } else {
+            g_Mastery = parseInt(localStorage.getItem('Hogwarts_Stat_Mastery')) || BLOODLINE_MATRIX[g_Bloodline].mastery;
+            g_Stamina = parseInt(localStorage.getItem('Hogwarts_Stat_Stamina')) || BLOODLINE_MATRIX[g_Bloodline].stamina;
+            g_Wisdom = parseInt(localStorage.getItem('Hogwarts_Stat_Wisdom')) || BLOODLINE_MATRIX[g_Bloodline].wisdom;
+            g_Emotion = parseInt(localStorage.getItem('Hogwarts_Stat_Emotion')) || BLOODLINE_MATRIX[g_Bloodline].emotion;
+            updatePanelUI();
+        }
+    };
+
+    function updatePanelUI() {
+        document.getElementById('panel-username').innerText = g_PlayerName;
+        document.getElementById('panel-blood').innerText = (g_Bloodline === "麻瓜") ? "麻瓜出身" : g_Bloodline + "背景";
+        document.getElementById('panel-mastery').innerText = g_Mastery;
+        document.getElementById('panel-stamina').innerText = g_Stamina;
+        document.getElementById('panel-wisdom').innerText = g_Wisdom;
+        document.getElementById('panel-emotion').innerText = g_Emotion;
+        document.getElementById('panel-wallet').innerText = g_Wallet;
+        document.getElementById('panel-bank').innerText = g_Bank;
+    }
+
+    function changeScene(currentId, nextId) {
+        document.getElementById(currentId).classList.remove('active');
+        document.getElementById(nextId).classList.add('active');
+    }
+
+    function triggerWallCross() {
+        changeScene('scene-platform-intro', 'scene-wall-loading');
+        setTimeout(function() {
+            changeScene('scene-wall-loading', 'scene-platform-success');
+        }, 1500); 
+    }
+
+    function selectBlessing(statType) {
+        if(statType === 'Mastery') g_Mastery += 2;
+        if(statType === 'Stamina') g_Stamina += 2;
+        if(statType === 'Wisdom') g_Wisdom += 2;
+        if(statType === 'Emotion') g_Emotion += 2;
+
+        updatePanelUI(); 
+        changeScene('scene-platform-success', 'scene-platform-end');
+    }
+
+    function navigateToChapter1_5() {
+        localStorage.setItem('Hogwarts_Stat_Mastery', g_Mastery);
+        localStorage.setItem('Hogwarts_Stat_Stamina', g_Stamina);
+        localStorage.setItem('Hogwarts_Stat_Wisdom', g_Wisdom);
+        localStorage.setItem('Hogwarts_Stat_Emotion', g_Emotion);
+        localStorage.setItem('Hogwarts_Progress', "1-5");
+        window.location.replace("chapter1_5.html"); 
+    }
+
+    function openSystemModal(type) {
+        toggleSidebar(); 
+        
+        if (type === 'guide') {
+            window.location.href = "intro.html";
+            return;
+        }
+
+        let titleNode = document.getElementById('modal-title-node');
+        let bodyNode = document.getElementById('modal-body-node');
+        
+        if(type === 'archive') {
+            titleNode.innerText = "⏳ 舊日魔法檔案";
+            bodyNode.innerHTML = `
+                <p style="text-align:center; color:#8b949e;">— 大廳時空紀錄維度 —</p>
+                <div style="opacity:0.4; text-align:center; margin-top:10px;">• 1-1 入學通知書 (已過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-2 巫師與麻瓜 (已過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-3 斜角巷置辦 (已過關)</div>
+                <div style="opacity:1; text-align:center; color:#dfcf9f; font-weight:bold;">• 1-4 九又四分之三月台 (當前現場)</div>
+            `;
+            document.getElementById('systemModal').style.display = 'flex';
+        }
+    }
+
+    function closeSystemModal() { 
+        document.getElementById('systemModal').style.display = 'none'; 
+    }
+    
+    function resetToMain大廳() { 
+        if(confirm("確定要拋下行李，退回主大廳首頁嗎？")) { 
+            window.location.replace("index.html"); 
+        } 
+    }
+
+    function initGame(bloodType) {
+        g_Bloodline = bloodType;
+        g_Mastery = BLOODLINE_MATRIX[bloodType].mastery;
+        g_Stamina = BLOODLINE_MATRIX[bloodType].stamina;
+        g_Wisdom = BLOODLINE_MATRIX[bloodType].wisdom;
+        g_Emotion = BLOODLINE_MATRIX[bloodType].emotion;
+        g_Bank = BLOODLINE_MATRIX[bloodType].bank;
+        updatePanelUI();
+        changeScene('scene-setup', 'scene-platform-intro');
+    }
+</script>
+
+</body>
+</html>
