@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>霍格華茲：車廂邂逅 - 李炅潣</title>
+    <style>
+        /* 🌌 Haniii 導演專屬：古典英倫深夜魔法美學 */
+        body {
+            background-color: #0b0e14;
+            color: #e6edf3;
+            font-family: "Georgia", "Times New Roman", "PingFang TC", "Heiti TC", sans-serif;
+            line-height: 1.8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* ☰ 頂端全域常駐漢堡導航欄 */
+        .top-nav-bar {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 55px;
+            background-color: rgba(11, 14, 20, 0.85);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #2a313d;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 900;
+        }
+
+        .menu-toggle-btn {
+            background: none; border: none;
+            color: #dfcf9f; font-size: 26px;
+            cursor: pointer; padding: 5px 10px;
+            display: flex; align-items: center;
+            transition: transform 0.2s;
+        }
+        .menu-toggle-btn:active { transform: scale(0.9); }
+
+        /* 🏰 左側全功能常駐狀態欄（抽屜面板） */
+        .sidebar-panel {
+            position: fixed;
+            top: 0; left: -300px; width: 300px; height: 100%;
+            background-color: #151922; border-right: 1px solid #2a313d;
+            box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+            z-index: 999;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 70px 20px 20px 20px; box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .sidebar-panel.open { left: 0; }
+
+        .sidebar-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6); z-index: 998;
+            backdrop-filter: blur(3px);
+        }
+
+        /* 📊 抽屜內嵌：巫師角色狀態檔案卡 */
+        .drawer-status-card {
+            background-color: #1f242c; border: 1px solid #2a313d;
+            border-top: 3px solid #dfcf9f; border-radius: 8px;
+            padding: 15px; margin-bottom: 20px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+        }
+        .drawer-card-title {
+            font-size: 0.85em; color: #8b949e; letter-spacing: 1px;
+            text-transform: uppercase; border-bottom: 1px solid #21262d;
+            padding-bottom: 6px; margin-bottom: 12px;
+            display: flex; justify-content: space-between;
+        }
+        
+        .drawer-stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .drawer-stat-box {
+            background-color: #151922; padding: 10px 6px; border-radius: 6px;
+            text-align: center; font-size: 0.85em; border: 1px solid #2a313d;
+        }
+        .drawer-stat-name { color: #8b949e; display: block; font-size: 0.8em; margin-bottom: 2px; }
+        .drawer-stat-value { color: #58a6ff; font-weight: bold; font-size: 1.05em; }
+        .money-gold { color: #dfcf9f; text-shadow: 0 0 4px rgba(223, 207, 159, 0.3); }
+
+        .sidebar-title-tag { color: #8b949e; font-size: 0.8em; font-weight: bold; margin-top: 20px; margin-bottom: 5px; display: block; }
+        .sidebar-btn {
+            width: 100%; background-color: #161b22; color: #cbd5e1;
+            border: 1px solid #30363d; padding: 12px; margin: 8px 0;
+            border-radius: 6px; cursor: pointer; font-size: 0.85em; font-weight: bold;
+            text-align: left; transition: all 0.2s;
+        }
+        .sidebar-btn:active { background-color: #223046; border-color: #dfcf9f; }
+        .sidebar-btn:disabled { background-color: #11141a; color: #484f58; border-color: #21262d; cursor: not-allowed; }
+
+        /* 🎬 主要劇情文字容器 */
+        .game-container {
+            max-width: 680px; width: 100%;
+            background-color: #151922; padding: 35px;
+            border-radius: 12px; border: 1px solid #2a313d;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            box-sizing: border-box; margin-top: 75px;
+        }
+        .story-block { display: none; }
+        .story-block.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        
+        h2 {
+            color: #dfcf9f; border-bottom: 1px solid #2a313d;
+            padding-bottom: 12px; font-weight: 500; margin-top: 0; letter-spacing: 1px;
+        }
+        p { text-align: justify; color: #cbd5e1; }
+
+        .hud {
+            background-color: #1f242c; padding: 20px; border-radius: 8px;
+            border-left: 4px solid #2ea44f; margin: 25px 0; font-size: 0.95em; line-height: 1.7;
+        }
+
+        .option-btn {
+            display: block; width: 100%; padding: 15px 20px; margin: 14px 0;
+            background-color: #1a2332; color: #c9d1d9; border: 1px solid #2d3d54;
+            border-radius: 6px; text-align: left; cursor: pointer;
+            font-size: 1em; font-family: inherit; transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        .option-btn:hover {
+            background-color: #223046; border-color: #2ea44f;
+            color: #ffffff; transform: translateX(4px);
+            box-shadow: 0 0 10px rgba(46, 164, 79, 0.2);
+        }
+
+        .next-btn { background-color: #0a4d26; color: #ffffff; border: 1px solid #2ea44f; text-align: center; font-weight: bold; margin-top: 25px; }
+        .next-btn:hover { background-color: #116934; border-color: #3fb950; box-shadow: 0 0 15px rgba(63, 185, 80, 0.4); }
+
+        .next-chapter-btn {
+            display: block; width: 100%; padding: 15px 20px;
+            background-color: #8b7355; color: #ffffff; border: 1px solid #6e5940;
+            border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer;
+            margin-top: 30px; box-shadow: 0 4px 12px rgba(139, 115, 85, 0.2); transition: all 0.2s;
+        }
+        .next-chapter-btn:hover { background-color: #a38865; box-shadow: 0 0 15px rgba(163, 136, 101, 0.5); transform: translateY(-2px); }
+
+        blockquote {
+            border-left: 3px solid #dfcf9f; margin: 20px 0; padding: 10px 15px;
+            background-color: #23201a; color: #dfcf9f; font-style: italic; border-radius: 0 6px 6px 0;
+        }
+
+        .modal-popup {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.85); z-index: 2000;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        .modal-card { background-color: #161b22; border: 1px solid #30363d; border-radius: 12px; max-width: 420px; width: 100%; padding: 25px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+    <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+    <div style="color: #dfcf9f; font-weight: bold; margin-left: 8px; font-size: 0.85em; letter-spacing: 1px;">🏰 車廂邂逅：李炅潣</div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar-panel" id="sidebarPanel">
+    
+    <div class="drawer-status-card">
+        <div class="drawer-card-title">
+            <span>🧙 巫師：<span id="panel-username" style="color:#dfcf9f; font-weight:bold;">讀取中..</span></span>
+        </div>
+        <div class="drawer-card-title" style="border:none; margin-bottom:5px; padding-bottom:0;">
+            <span>🏰 學籍：<span style="color:#79c0ff; font-weight:bold;">四年級轉校生</span></span>
+        </div>
+    </div>
+
+    <div class="sidebar-title-tag">— ⚖️ 靈魂核心特質 —</div>
+    <div class="drawer-status-card">
+        <div class="drawer-stat-grid">
+            <div class="drawer-stat-box"><span class="drawer-stat-name">魔咒熟練</span><span class="drawer-stat-value" id="panel-mastery">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">體力值</span><span class="drawer-stat-value" id="panel-stamina">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">智慧值</span><span class="drawer-stat-value" id="panel-wisdom">--</span></div>
+            <div class="drawer-stat-box"><span class="drawer-stat-name">情感值</span><span class="drawer-stat-value" id="panel-emotion">--</span></div>
+        </div>
+    </div>
+
+    <div class="sidebar-title-tag">— 💰 巫師資產帳本 —</div>
+    <div class="drawer-status-card">
+        <div style="font-size:0.85em; margin-bottom:8px;">血統：<span id="panel-blood" style="color:#79c0ff; font-weight:bold;">讀取中..</span></div>
+        <div style="font-size:0.85em; margin-bottom:8px;">隨身錢袋：<span class="drawer-stat-value money-gold" id="panel-wallet">--</span> 加隆</div>
+        <div style="font-size:0.85em;">古靈閣金庫：<span class="drawer-stat-value money-gold" id="panel-bank">--</span> 加隆</div>
+    </div>
+
+    <div class="sidebar-title-tag">— ⚙️ 系統導航 —</div>
+    <button class="sidebar-btn" id="nav-diary-btn" onclick="openDiaryPage()">📜 翻閱《巫師個人指南》</button>
+    <button class="sidebar-btn" id="nav-archive-btn" onclick="openSystemModal('archive')">⏳ 翻開《舊日魔法檔案》</button>
+    <button class="sidebar-btn" id="nav-guide-btn" onclick="openSystemModal('guide')">🔮 查閱《入學指南介紹》</button>
+    <button class="sidebar-btn" style="color: #e06c75; margin-top: 20px; border-color: #4c2929;" onclick="resetToMain大廳()">🚪 逃離並退回遊戲大廳</button>
+</div>
+
+<div class="game-container">
+
+    <!-- 🌟 階段一：初次見面 -->
+    <div id="block-meet" class="story-block active">
+        <h2>🦅 琳瑯滿目的展覽隔間</h2>
+        <p>當你推開這間車廂門時，你會懷疑自己是不是誤入了什麼魔法道具展覽館。</p>
+        <p>空間裡擺滿了包裝精美的新奇玩意兒：會自動旋轉的占星儀、五顏六色的佐科惡作劇糖果，甚至還有一張鋪滿大半個桌子的活米村精細全景地圖。座位上坐著一個長相極其精緻、笑起來帶著可愛貓咪相的男生。他穿著雷文克勞的四年級巫師袍，雖然是聰明的雷文克勞，但他身上散發著一種極具親和力的社交氣息。他正在用一根漂亮的羽毛筆在筆記本上塗塗改改，看見你黑色的轉學生制服，他雙眼一亮，立刻露出招牌的熱情笑容，一邊把桌上的小道具挪開一邊招呼你：「哇！是新來的四年級轉學生對不對？快進來坐，我這裡有好多好玩的！」</p>
+        
+        <button class="option-btn" onclick="chooseQ1('A')">「不好意思，我可能不太習慣這麼熱鬧的地方，打擾了。」</button>
+        <button class="option-btn" onclick="chooseQ1('B')">「哇，這些都是什麼？你看起來知道很多霍格華茲周邊的好玩地方。」</button>
+        <button class="option-btn" onclick="chooseQ1('C')">「天啊，這不是蜂蜜公爵最新的『吹寶超級泡泡糖』嗎？還有佐科的惡作劇味覺糖！你是在收集活米村的特產嗎？」</button>
+    </div>
+
+    <!-- 🌟 階段一分支：轉身離開 -->
+    <div id="block-leave-action" class="story-block">
+        <h2>🚂 重新回到廊道</h2>
+        <p>你對他抱歉地笑了笑，帶上車門。李炅潣有些失望地撇了撇貓咪嘴：「啊……還想找人一起試試新品呢。」你拉著行李箱，繼續在搖晃的列車中尋找下一個落腳點。</p>
+        <button class="option-btn next-btn" onclick="returnToCorridor()">回到列車長廊</button>
+    </div>
+
+    <!-- 🌟 靈魂質問分支反饋 -->
+    <div id="block-meet-result" class="story-block">
+        <h2>🗺️ 繽紛活潑的角落</h2>
+        <p id="meet-text-node"></p>
+        <button class="option-btn next-btn" onclick="goToLockQuestion()">繼續前行</button>
+    </div>
+
+    <!-- 🌟 靈魂質問：天規彈窗 -->
+    <div id="block-lock-question" class="story-block">
+        <h2>⚖️ 命運天平的考驗</h2>
+        <div class="hud" style="border-left-color: #dfcf9f; background-color: #23201a;">
+            <strong style="color: #dfcf9f;">【後台系統提示】</strong><br>
+            檢測到與男主【李炅潣】建立初步接触。是否鎖定李炅潣為您的潛在攻略對象？
+        </div>
+        <button class="option-btn" onclick="setLockRoute(true)">【是】 開啟戀人發展線。</button>
+        <button class="option-btn" onclick="setLockRoute(false)">【選否】 鎖定為純友誼分支（未來特殊劇情節點可重新調整）。</button>
+    </div>
+
+    <!-- 🌟 階段二：活米村地圖 -->
+    <div id="block-village" class="story-block">
+        <h2>📜 羊皮紙上的秘密通道</h2>
+        <p>炅潣興奮地鋪開那張精緻的活米村地圖，拿羽毛筆指著上面的店鋪，神祕兮兮地對你說：「等到了三年級以上就可以去活米村了，雖然你剛轉學過來，但過幾天的週末我就可以帶你偷偷溜去看看。你最想去哪家店？」</p>
+        
+        <button class="option-btn" onclick="chooseQ2('A')">「三根掃帚酒吧。我想嚐嚐傳說中的奶油啤酒，聽說喝下去能讓人全身暖洋洋、迅速恢復體力。」</button>
+        <button class="option-btn" onclick="chooseQ2('B')">「德維與班吉禮品店。聽說那裡有很多精密的魔法防禦道具，我想去看看有沒有能精進咒語熟練度的工具。」</button>
+        <button class="option-btn" onclick="chooseQ2('C')">「文具用品店吧。我想買一些雷文克勞常用的高級羊皮紙、還有帶有記錄功能的智慧羽毛筆。」</button>
+    </div>
+
+    <!-- 🌟 階段二反饋 -->
+    <div id="block-village-result" class="story-block">
+        <h2>💬 嚮往之地的約定</h2>
+        <p id="village-text-node"></p>
+        <button class="option-btn next-btn" onclick="goToBoxBlock()">隨車廂前行</button>
+    </div>
+
+    <!-- 🌟 階段三：八音盒卡住 -->
+    <div id="block-box" class="story-block">
+        <h2>🎼 驟然卡殼的城堡模型</h2>
+        <p>聊到一半，炅潣有些得意地向你展示一個會唱歌的霍格華茲城堡模型八音盒。但可能因為他一路上擺弄太多次，發條突然卡住了，八音盒開始發出極其刺耳、尖銳的魔法雜音。</p>
+        
+        <button class="option-btn" onclick="chooseQ3('A')">沒有介意，溫柔地拍了拍有些尷尬和手忙腳亂的炅潣：「沒關係的，魔法道具偶爾鬧脾氣也很正常，我們一起看看是哪裡卡住了。」</button>
+        <button class="option-btn" onclick="chooseQ3('B')">憑藉極其敏銳的觀察力與手速，一眼指出八音盒微小齒輪上卡住的一顆惡作劇糖果屑，伸出手指靈巧地將其彈開。</button>
+        <button class="option-btn" onclick="chooseQ3('C')">沉著地拿出魔杖，在八音盒上輕巧地敲了敲，口中流暢地念出修正咒語：「修修復（Reparo）！」</button>
+    </div>
+
+    <!-- 🌟 階段三反饋 -->
+    <div id="block-box-result" class="story-block">
+        <h2>🎵 恢復的和弦</h2>
+        <p id="box-text-node"></p>
+        <button class="option-btn next-btn" onclick="goToEndingBlock()">列車到站</button>
+    </div>
+
+    <!-- 🌟 最終章：結算與出站 -->
+    <div id="block-ending" class="story-block">
+        <h2>🚂 活米村車站的黑夜</h2>
+        <p>火車在一聲悠長而沉重的汽笛聲中，緩緩停靠在了被黑夜籠罩的活米村車站。窗外，巨大的提燈在夜霧中晃動，海格那如雷般的聲音隱約傳來：「一年級新生，還有那位新來的轉學生，到這裡來！」</p>
+        <p>你站起身，整理了一下衣褶，與這位精緻且活潑的雷文克勞少年道別。</p>
+        
+        <div class="hud" style="border-left-color: #58a6ff;">
+            <strong style="color: #58a6ff;">【系統提示：本次車廂邂逅結算】</strong><br>
+            • 您與 【李炅潣】 的初始好感度變更為：<span id="end-love-val" style="color:#dfcf9f; font-weight:bold;">--</span> 點。<br>
+            • 身為四年級轉學生的您，在對話中展現了獨特的個人特質，基礎能力值獲得提升：<br>
+            <span id="end-stats-node" style="color:#79c0ff; font-weight:bold;">--</span><br>
+            • (本次結算共計提升個人屬性 3 點)
+        </div>
+        <p>命運的齒輪已然轉動，霍格華茲的大門正式為您敞開。</p>
+        <button class="next-chapter-btn" onclick="finalizeAndWriteStorage()">[ 闔上日記，返回魔法大廳 ]</button>
+    </div>
+
+</div>
+
+<div class="modal-popup" id="systemModal" onclick="closeSystemModal()">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div id="modal-title-node" style="color:#dfcf9f; font-weight:bold; font-size:1.1em; border-bottom:1px solid #30363d; padding-bottom:8px; margin-bottom:12px; text-align:center; letter-spacing:1px;"></div>
+        <div id="modal-body-node" style="font-size:0.95em; line-height:1.6; color:#c9d1d9;"></div>
+        <button class="sidebar-btn" style="text-align:center; margin-top:15px; background-color:#21262d;" onclick="closeSystemModal()">關閉面板</button>
+    </div>
+</div>
+
+<script>
+    // ⚙️ 100% 複製 1-4 緩存大帳本機制
+    let g_PlayerName = localStorage.getItem('Hogwarts_PlayerName') || "新巫師"; 
+    let g_Bloodline = localStorage.getItem('Hogwarts_Bloodline') || "";
+    let g_Wallet = parseInt(localStorage.getItem('Hogwarts_Wallet')) || 53; 
+    let g_Bank = parseInt(localStorage.getItem('Hogwarts_Bank')) || 500;
+
+    let g_Mastery = 0; let g_Stamina = 0; let g_Wisdom = 0; let g_Emotion = 0;
+
+    // 🕹️ 本次邂逅過程累積器
+    let add_Love = 0;
+    let add_Mastery = 0;
+    let add_Stamina = 0;
+    let add_Wisdom = 0;
+    let add_Talent = 0; // 對齊 Emotion 核心
+
+    const BLOODLINE_MATRIX = {
+        "純血": { mastery: 25, stamina: 22, wisdom: 22, emotion: 21, bank: 500 },
+        "混血": { mastery: 23, stamina: 23, wisdom: 23, emotion: 23, bank: 500 },
+        "麻瓜": { mastery: 21, stamina: 24, wisdom: 24, emotion: 24, bank: 1000 }
+    };
+
+    function toggleSidebar() {
+        let panel = document.getElementById('sidebarPanel');
+        let overlay = document.getElementById('sidebarOverlay');
+        if(panel.classList.contains('open')) {
+            panel.classList.remove('open'); overlay.style.display = 'none';
+        } else {
+            panel.classList.add('open'); overlay.style.display = 'block';
+        }
+    }
+
+    window.onload = function() {
+        // 禁止倒流歷史截擊
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', function () {
+            history.pushState(null, null, document.URL);
+            alert("『回憶已經定格，收回你的時光器。』");
+        });
+
+        // 加載 1-4 最新數據
+        if (g_Bloodline !== "") {
+            g_Mastery = parseInt(localStorage.getItem('Hogwarts_Stat_Mastery')) || BLOODLINE_MATRIX[g_Bloodline].mastery;
+            g_Stamina = parseInt(localStorage.getItem('Hogwarts_Stat_Stamina')) || BLOODLINE_MATRIX[g_Bloodline].stamina;
+            g_Wisdom = parseInt(localStorage.getItem('Hogwarts_Stat_Wisdom')) || BLOODLINE_MATRIX[g_Bloodline].wisdom;
+            g_Emotion = parseInt(localStorage.getItem('Hogwarts_Stat_Emotion')) || BLOODLINE_MATRIX[g_Bloodline].emotion;
+        } else {
+            g_Mastery = parseInt(localStorage.getItem('Hogwarts_Stat_Mastery')) || 20;
+            g_Stamina = parseInt(localStorage.getItem('Hogwarts_Stat_Stamina')) || 20;
+            g_Wisdom = parseInt(localStorage.getItem('Hogwarts_Stat_Wisdom')) || 20;
+            g_Emotion = parseInt(localStorage.getItem('Hogwarts_Stat_Emotion')) || 20;
+        }
+        
+        updatePanelUI();
+    };
+
+    function updatePanelUI() {
+        document.getElementById('panel-username').innerText = g_PlayerName;
+        document.getElementById('panel-blood').innerText = (g_Bloodline === "麻瓜") ? "麻瓜出身" : g_Bloodline + "背景";
+        document.getElementById('panel-mastery').innerText = g_Mastery;
+        document.getElementById('panel-stamina').innerText = g_Stamina;
+        document.getElementById('panel-wisdom').innerText = g_Wisdom;
+        document.getElementById('panel-emotion').innerText = g_Emotion;
+        document.getElementById('panel-wallet').innerText = g_Wallet;
+        document.getElementById('panel-bank').innerText = g_Bank;
+    }
+
+    function changeBlock(currentId, nextId) {
+        document.getElementById(currentId).classList.remove('active');
+        document.getElementById(nextId).classList.add('active');
+    }
+
+    // 🔒 天規：進入Q2（village）開始，物理切斷導航，禁止返回與利用日記刷分
+    function enforceNoReturnLock() {
+        document.getElementById('nav-diary-btn').disabled = true;
+        document.getElementById('nav-archive-btn').disabled = true;
+        document.getElementById('nav-guide-btn').disabled = true;
+    }
+
+    // ▍Q1 決策
+    function chooseQ1(choice) {
+        let node = document.getElementById('meet-text-node');
+        if (choice === 'A') {
+            changeBlock('block-meet', 'block-leave-action');
+        } else if (choice === 'B') {
+            add_Love += 1;
+            node.innerText = `炅潣一聽，高興地拍了下手，那雙漂亮的眼睛彎成了月牙：「你問對人了！我是李炅潣，雷文克勞四年級。不管是學校的秘密通道還是好玩的道具，找我準沒錯，快坐快坐！」`;
+            changeBlock('block-meet', 'block-meet-result');
+        } else if (choice === 'C') {
+            add_Love += 3;
+            node.innerText = `李炅潣雙眼瞬間放光，彷彿找到了靈魂伴侶一般，驚喜地看著你：「天啊！你竟然一眼就全認出來了？不愧是能直接插班四年級的人，太懂生活了吧！我是李炅潣，快坐快坐，這顆會唱歌的泡泡糖送你了！」`;
+            changeBlock('block-meet', 'block-meet-result');
+        }
+    }
+
+    function returnToCorridor() {
+        window.location.replace("chapter1_5.html");
+    }
+
+    function goToLockQuestion() {
+        changeBlock('block-meet-result', 'block-lock-question');
+    }
+
+    // ⚖️ 靈魂質問
+    function setLockRoute(isLocked) {
+        if (isLocked) {
+            localStorage.setItem('Hogwarts_Route_KYUNGMIN_LockedFriend', 'false');
+        } else {
+            localStorage.setItem('Hogwarts_Route_KYUNGMIN_LockedFriend', 'true');
+        }
+        // 前進到Q2，同步發動天規鎖死功能
+        enforceNoReturnLock();
+        changeBlock('block-lock-question', 'block-village');
+    }
+
+    // ▍Q2 決策
+    function chooseQ2(choice) {
+        let node = document.getElementById('village-text-node');
+        if (choice === 'A') {
+            add_Love += 3; add_Stamina += 2;
+            node.innerText = `「那到時候第一杯一定要我請客！」炅潣笑得眼睛彎彎，對細節極其講究的他補充道：「我們一定要坐在靠窗的熱門位置，那裡的壁爐最暖和了，最適合放鬆身體。」`;
+        } else if (choice === 'B') {
+            add_Love += 1; add_Mastery += 2;
+            node.innerText = `炅潣的身體微微縮了縮，隨即又挺起胸膛，開玩笑地看著你：「哇，一上來就這麼硬核的研究方向啊？真有你的。不過如果你想去，我也不是不能捨命陪同啦。」`;
+        } else if (choice === 'C') {
+            add_Love += 2; add_Wisdom += 2;
+            node.innerText = `「哈哈，這就很符合我們雷文克勞的知性風格了！」炅潣高興地在圖紙上畫了個圈：「那家店的墨水味道特別好聞，到時候我幫你挑最精緻的一款。」`;
+        }
+        changeBlock('block-village', 'block-village-result');
+    }
+
+    function goToBoxBlock() {
+        changeBlock('block-village-result', 'block-box');
+    }
+
+    // ▍Q3 決策
+    function chooseQ3(choice) {
+        let node = document.getElementById('box-text-node');
+        if (choice === 'A') {
+            add_Love += 3; add_Talent += 1;
+            node.innerText = `炅潣看著你溫柔的側臉，心跳有些加速，精緻的臉頰有些微紅。他有些羞赧地低下頭，聲音比平時低了幾分：「嗯……謝謝你。你脾氣真好，沒有嫌牠吵。」`;
+        } else if (choice === 'B') {
+            add_Love += 2; add_Stamina += 2;
+            node.innerText = `刺耳的雜音瞬間消失，取而代之的是霍格華茲校歌的美妙旋律。炅潣一臉崇拜地看著你：「哇！你太厲害了吧！真細心，手腳這麼靈巧，一下子就解決了！」`;
+        } else if (choice === 'C') {
+            add_Love += 2; add_Mastery += 2;
+            node.innerText = `八音盒完美恢復。炅潣被你這手流暢的日常解咒驚艷到了，一臉崇拜地撐著下巴看著你：「天啊，還沒分院，你對咒語的熟練度就這麼高了。我真的越來越佩服你，也越來越期待接下來和你的校園生活了！」`;
+        }
+        changeBlock('block-box', 'block-box-result');
+    }
+
+    function goToEndingBlock() {
+        let statsStr = "";
+        if(add_Mastery > 0) statsStr += `✨ 魔咒熟練度 +${add_Mastery} <br>`;
+        if(add_Stamina > 0) statsStr += `💪 巫師體力分值 +${add_Stamina} <br>`;
+        if(add_Wisdom > 0) statsStr += `🧠 魔法智慧底蘊 +${add_Wisdom} <br>`;
+        if(add_Talent > 0) statsStr += `🌿 靈魂天賦分值 +${add_Talent} <br>`;
+        if(statsStr === "") statsStr = "屬性值無變動";
+
+        document.getElementById('end-love-val').innerText = add_Love;
+        document.getElementById('end-stats-node').innerHTML = statsStr;
+
+        changeBlock('block-box-result', 'block-ending');
+    }
+
+    // 💾 最終結算：寫入全域 LocalStorage 歷史大帳本
+    function finalizeAndWriteStorage() {
+        let curLove = parseInt(localStorage.getItem('Hogwarts_Love_KYUNGMIN')) || 0;
+        
+        localStorage.setItem('Hogwarts_Love_KYUNGMIN', curLove + add_Love);
+        localStorage.setItem('Hogwarts_Stat_Mastery', g_Mastery + add_Mastery);
+        localStorage.setItem('Hogwarts_Stat_Stamina', g_Stamina + add_Stamina);
+        localStorage.setItem('Hogwarts_Stat_Wisdom', g_Wisdom + add_Wisdom);
+        localStorage.setItem('Hogwarts_Stat_Emotion', g_Emotion + add_Talent); // 寫入 Emotion 以相容日記
+
+        localStorage.setItem('Hogwarts_Progress', "1-6");
+        window.location.replace("index.html");
+    }
+
+    function openDiaryPage() {
+        toggleSidebar();
+        localStorage.setItem('Hogwarts_Stat_Mastery', g_Mastery);
+        localStorage.setItem('Hogwarts_Stat_Stamina', g_Stamina);
+        localStorage.setItem('Hogwarts_Stat_Wisdom', g_Wisdom);
+        localStorage.setItem('Hogwarts_Stat_Emotion', g_Emotion);
+        window.location.href = "diary.html";
+    }
+
+    function openSystemModal(type) {
+        toggleSidebar(); 
+        if (type === 'guide') { window.location.href = "intro.html"; return; }
+
+        let titleNode = document.getElementById('modal-title-node');
+        let bodyNode = document.getElementById('modal-body-node');
+        
+        if(type === 'archive') {
+            titleNode.innerText = "⏳ 舊日魔法檔案";
+            bodyNode.innerHTML = `
+                <p style="text-align:center; color:#8b949e;">— 大廳時空紀錄維度 —</p>
+                <div style="opacity:0.4; text-align:center; margin-top:10px;">• 1-4 九又四分之三月台 (已過關)</div>
+                <div style="opacity:0.4; text-align:center;">• 1-5 霍格華茲特快車 (已過關)</div>
+                <div style="opacity:1; text-align:center; color:#dfcf9f; font-weight:bold;">• 1-5 邂逅：李炅潣篇 (當前現場)</div>
+            `;
+            document.getElementById('systemModal').style.display = 'flex';
+        }
+    }
+
+    function closeSystemModal() { document.getElementById('systemModal').style.display = 'none'; }
+    function resetToMain大廳() { if(confirm("確定要拋下行李，退回主大廳首頁嗎？")) { window.location.replace("index.html"); } }
+</script>
+
+</body>
+</html>
